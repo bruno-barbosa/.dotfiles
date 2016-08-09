@@ -4,11 +4,9 @@ You may use this Dot Files as base for your Bash configurations or you may use i
 
 ### Instructions
 
-1. Clone repository to your home directory;
-2. Create .bash_profile inside your home directory;
-3. Load .bash_profile with the following sources:
-source ~/.bashrc
-source ~/.files/.sources.bash
+1. Clone repository git clone --recursive git@github.com:bruno-barbosa/.dotfiles.git
+2. CD into ~/.dotfiles
+3. Run ./install.sh
 
 ### License
 
