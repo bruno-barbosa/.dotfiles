@@ -14,7 +14,7 @@ alias emptytrash='sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo 
 alias update='sudo softwareupdate -i -a; brew update; brew upgrade --all; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update'
 
 # reload resource
-alias resource='source $ZSH_SOURCES/.sources.zsh'
+alias resource='source ~/.dotfiles/zsh/.sources.zsh'
 
 # check local ip and public ip
 alias ip='dig +short myip.opendns.com @resolver1.opendns.com'

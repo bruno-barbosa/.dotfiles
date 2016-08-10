@@ -73,7 +73,7 @@ POWERLEVEL9K_BATTERY_DISCONNECTED_VISUAL_IDENTIFIER_COLOR="249"
 POWERLEVEL9K_TIME_BACKGROUND="black"
 POWERLEVEL9K_TIME_FOREGROUND="249"
 POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S} \UE12E"
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( 'os_icon' 'context' 'dir' 'nvmShowVersion' 'rvmShowVersion' 'vcs')
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( 'os_icon' 'context' 'dir' 'nvmShowVersion' 'rvmShowVersion' 'virtualenv' 'vcs')
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('status' 'zshShowStatus' 'battery' 'time')
 
 # Uncomment the following line to use case-sensitive completion.
@@ -118,7 +118,7 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('status' 'zshShowStatus' 'battery' 'time')
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git, virtualenv, virtualvwrapper)
 
 # User configuration
 

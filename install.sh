@@ -50,18 +50,36 @@ brew.install shpotify
 brew tap caskroom/cask
 brew.install zsh-completions
 
-brew.cask.install atom
-brew.cask.install spotify
-brew.cask.isntall dashlane
-brew.cask.isntall evernote
-brew.cask.install google-chrome
-
+run "Installing utilities apps"
 brew.cask.install qlstephen
 brew.cask.install betterzipql
 brew.cask.install qlcolorcode
 brew.cask.install qlprettypatch
 brew.cask.install quicklook-csv
 brew.cask.install quicklook-json
+
+run "Installing core apps"
+brew.cask.install spotify
+brew.cask.isntall dashlane
+brew.cask.isntall evernote
+brew.cask.install google-chrome
+
+run "Installing devloper apps"
+brew.cask.install atom
+
+run "Installing miscellaneous apps"
+
+run "Cleaning up brew cask"
+brew cleanup --force
+rm -rf /Library/Caches/Homebrew/*
+
+
+###
+# Install fonts
+###
+run "installing powerline fonts"
+./zsh/fonts/install.sh
+ok
 
 ###
 # Install rvm and its dependencies

@@ -2,12 +2,13 @@
 
 # general navigation aliases
 alias ..='cd ..'
+alias ...='cd ../..'
 
 # specific directory aliases
-alias code='cd ~/Projects/code'
-alias temp='cd ~/Projects/temp'
-alias dropbox='cd ~/Dropbox'
+alias go.code='cd ~/Projects/code'
+alias go.temp='cd ~/Projects/temp'
+alias go.dropbox='cd ~/Dropbox'
 
-alias download='cd ~/Downloads'
+alias go.download='cd ~/Downloads'
 
-alias .files='cd ~/.files'
+alias go.dotfiles='cd ~/.dotfiles'
