@@ -39,134 +39,53 @@ fi
 # Install brew and its dependencies
 # add new brew && cask installations here
 ####
+run "checking brew installation & installing brew cask"
 check.brew
-brew.install zsh
-brew.install git
-brew.install gpg
-brew.isntall gpg2
-brew.install ruby
-brew.isntall mongodb
-brew.install shpotify
-brew tap caskroom/cask
-brew.install zsh-completions
+brew.installer.start
+ok
 
-run "Installing utilities apps"
-brew.cask.install qlstephen
-brew.cask.install betterzipql
-brew.cask.install qlcolorcode
-brew.cask.install qlprettypatch
-brew.cask.install quicklook-csv
-brew.cask.install quicklook-json
-
-run "Installing core apps"
-brew.cask.install spotify
-brew.cask.isntall dashlane
-brew.cask.isntall evernote
-brew.cask.install google-chrome
-
-run "Installing devloper apps"
-brew.cask.install atom
-
-run "Installing miscellaneous apps"
-
-run "Cleaning up brew cask"
+run "cleaning up brew & cask"
 brew cleanup --force
 rm -rf /Library/Caches/Homebrew/*
+ok
 
-
-###
+####
 # Install fonts
-###
+####
 run "installing powerline fonts"
 ./zsh/fonts/install.sh
 ok
 
-###
+####
 # Install rvm and its dependencies
-###
+####
 check.rvm
+ok
 
-###
+####
 # Install rvm and its dependencies
-###
+####
 check.nvm
+ok
 
-###
+####
+# Setting up R and enabling rJava support
+####
+run "setting up R and enabling rJava support"
+R CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers
+ok
+
+####
 # Move .zscrc file to home directory
-###
+####
 run "backing up old zshrc file and copying new configurations"
-mv $HOME/.zshrc .zshrc.bkp
-mv ./bin/configs/.zshrc $HOME
+mv $HOME/.zshrc $HOME/.dotfiles/zsh/.zshrc.bkp
+ln -s ~/.dotfiles/zsh/.zshrc $HOME
+ok
 
+####
 # Configure .gitconfig file
-###
-grep 'user = GITHUBUSER' ./bin/.gitconfig > /dev/null 2>&1
-if [[ $? = 0 ]]; then
-    read -r -p "What is your github.com username? " githubuser
-
-  fullname=`osascript -e "long user name of (system info)"`
-
-  if [[ -n "$fullname" ]];then
-    lastname=$(echo $fullname | awk '{print $2}');
-    firstname=$(echo $fullname | awk '{print $1}');
-  fi
-
-  if [[ -z $lastname ]]; then
-    lastname=`dscl . -read /Users/$(whoami) | grep LastName | sed "s/LastName: //"`
-  fi
-  if [[ -z $firstname ]]; then
-    firstname=`dscl . -read /Users/$(whoami) | grep FirstName | sed "s/FirstName: //"`
-  fi
-  email=`dscl . -read /Users/$(whoami)  | grep EMailAddress | sed "s/EMailAddress: //"`
-
-  if [[ ! "$firstname" ]];then
-    response='n'
-  else
-    echo -e "I see that your full name is $COL_YELLOW$firstname $lastname$COL_RESET"
-    read -r -p "Is this correct? [Y|n] " response
-  fi
-
-  if [[ $response =~ ^(no|n|N) ]];then
-    read -r -p "What is your first name? " firstname
-    read -r -p "What is your last name? " lastname
-  fi
-  fullname="$firstname $lastname"
-
-  bot "Great $fullname, "
-
-  if [[ ! $email ]];then
-    response='n'
-  else
-    echo -e "The best I can make out, your email address is $COL_YELLOW$email$COL_RESET"
-    read -r -p "Is this correct? [Y|n] " response
-  fi
-
-  if [[ $response =~ ^(no|n|N) ]];then
-    read -r -p "What is your email? " email
-    if [[ ! $email ]];then
-      error "you must provide an email to configure .gitconfig"
-      exit 1
-    fi
-  fi
-
-
-  run "replacing items in .gitconfig with your info ($COL_YELLOW$fullname, $email, $githubuser$COL_RESET)"
-
-  # test if gnu-sed or osx sed
-
-  sed -i "s/GITHUBFULLNAME/$firstname $lastname/" ./bin/.gitconfig > /dev/null 2>&1 | true
-  if [[ ${PIPESTATUS[0]} != 0 ]]; then
-    echo
-    run "looks like you are using OSX sed rather than gnu-sed, accommodating"
-    sed -i '' "s/GITHUBFULLNAME/$firstname $lastname/" ./bin/.gitconfig;
-    sed -i '' 's/GITHUBEMAIL/'$email'/' ./bin/.gitconfig;
-    sed -i '' 's/GITHUBUSER/'$githubuser'/' ./bin/.gitconfig;
-  else
-    echo
-    bot "looks like you are already using gnu-sed. woot!"
-    sed -i 's/GITHUBEMAIL/'$email'/' ./bin/.gitconfig;
-    sed -i 's/GITHUBUSER/'$githubuser'/' ./bin/.gitconfig;
-  fi
-  run "copying gitconfig to home directory"
-  mv ./bin/.gitconfig $HOME
-fi
+####
+run "initiating git.config configuration"
+git.config
+ok
