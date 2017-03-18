@@ -76,6 +76,7 @@ function brew.installer.start() {
 
   run "installing essential utilities"
   brew.install git
+  brew.install yarn
   brew.install gpg
   brew.install gpg2
   brew.install libsvg
