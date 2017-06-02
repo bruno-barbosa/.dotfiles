@@ -15,6 +15,12 @@ function codecount() {
   cloc "$@" --exclude-dir=node_modules,bower_components,vendor
 }
 
+# kill specified port
+function kill.port() {
+  lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9
+  echo "Port" $1 "found and killed."
+}
+
 # determine total size of file or directory an argument can be passed
 function fs() {
 	if du -b /dev/null > /dev/null 2>&1; then
