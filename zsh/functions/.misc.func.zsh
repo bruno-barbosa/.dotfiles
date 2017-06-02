@@ -86,3 +86,21 @@ function calc() {
 	fi;
 	printf "\n";
 }
+
+function update() {
+	if [ $1 = 'zsh' ]; then
+		(
+			git clone https://github.com/bhilburn/powerlevel9k.git ~/.dotfiles/zsh/.oh-my-zsh/custom/themes/powerlevel9k
+		);
+	else
+		(
+			sudo softwareupdate -i -a
+			brew update
+			brew upgrade
+			brew cleanup
+			npm update -g
+			sudo gem update --system
+			sudo gem update
+		)
+	fi;
+}

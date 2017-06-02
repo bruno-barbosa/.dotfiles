@@ -1,7 +1,7 @@
 # NVM FUNCTIONS
 
 # Upgrade nvm to latest version
-nvm.upgrade() {
+function nvm.upgrade() {
 	(
 	  cd "$NVM_DIR"
 	  git fetch origin
@@ -9,7 +9,7 @@ nvm.upgrade() {
 	) && . "$NVM_DIR/nvm.sh"
 }
 
-nvm.latest() {
+function nvm.latest() {
 	(
 		current=$(nvm version)
 		nvm install node --resinstall-packages-from="${current:1:${#current}-1}"
@@ -17,10 +17,10 @@ nvm.latest() {
 	)
 }
 
-nvm.lts() {
+function nvm.lts() {
 	(
 	current=$(nvm version)
 	nvm install --lts --resinstall-packages-from="${current:1:${#current}-1}"
-	nvm alias lts node
+	nvm alias lts lts
 	)
 }
