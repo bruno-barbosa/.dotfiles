@@ -11,4 +11,4 @@ export NVM_DIR="/Users/bruno/.nvm"
 
 # Default priority path
 export PATH=/usr/local/bin:$PATH
-export GOPATH=$HOME/Projects/Personal/go:$HOME/Projects/Yewno/go
+export GOPATH=$HOME/.go:$HOME/Projects/Personal/go:$HOME/Projects/Yewno/go
