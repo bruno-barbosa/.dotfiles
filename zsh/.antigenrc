@@ -1,5 +1,7 @@
 # Antigen bundles
 
+POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/bhilburn/powerlevel9k
+
 antigen bundles <<EOBUNDLES
     # Bundles from the default repo (robbyrussell's oh-my-zsh)
     git
@@ -32,5 +34,7 @@ antigen bundles <<EOBUNDLES
         cygwin
     fi
 EOBUNDLES
+
+antigen theme bhilburn/powerlevel9k powerlevel9k
 
 antigen apply
