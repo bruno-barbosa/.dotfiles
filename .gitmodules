@@ -3,4 +3,7 @@
 	url = https://github.com/robbyrussell/oh-my-zsh
 [submodule "zsh/antigen"]
 	path = zsh/antigen
-	url = https://github.com/zsh-users/antigen/antigen
+	url = https://github.com/zsh-users/antigen.git
+[submodule "tmux"]
+	path = tmux
+	url = https://github.com/tmux/tmux.git
