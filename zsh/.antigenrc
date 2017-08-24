@@ -1,0 +1,36 @@
+# Antigen bundles
+
+antigen bundles <<EOBUNDLES
+    # Bundles from the default repo (robbyrussell's oh-my-zsh)
+    git
+    git-extras
+    tmux
+    ssh-agent
+    virtualenv
+    command-not-found
+
+    # Syntax highlighting bundle.
+    zsh-users/zsh-syntax-highlighting
+
+    # Fish-like auto suggestions
+    zsh-users/zsh-autosuggestions
+
+    # Extra zsh completions
+    zsh-users/zsh-completions
+
+
+    # OS specific plugins
+    if [[ $CURRENT_OS == 'OS X' ]]; then
+            osx
+    elif [[ $CURRENT_OS == 'Linux' ]]; then
+        # None so far...
+
+        if [[ $DISTRO == 'CentOS' ]]; then
+            centos
+        fi
+    elif [[ $CURRENT_OS == 'Cygwin' ]]; then
+        cygwin
+    fi
+EOBUNDLES
+
+antigen apply

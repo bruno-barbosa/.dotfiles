@@ -2,11 +2,6 @@
 export ZSH=$HOME/.dotfiles/zsh/oh-my-zsh
 export DEFAULT_USER="$USER"
 
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-
 ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_MODE='flat'
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
@@ -118,18 +113,15 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git, virtualenv, virtualvwrapper)
+#plugins=(osx, git, git-extras, command-not-found, ssh-agent, virtualenv, virtualvwrapper)
 
 # User configuration
 
 # export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 # export MANPATH="/usr/local/man:$MANPATH"
 
-source $HOME/.dotfiles/zsh/.sources.zsh
-
-
 # You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
@@ -142,7 +134,7 @@ source $HOME/.dotfiles/zsh/.sources.zsh
 # export ARCHFLAGS="-arch x86_64"
 
 # ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
+export SSH_KEY_PATH="~/.ssh/bruno@barbosa.io"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -152,3 +144,17 @@ source $HOME/.dotfiles/zsh/.sources.zsh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+export NVM_DIR="/Users/bruno/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# Better history
+# Credits to https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "^[[A" up-line-or-beginning-search # Up
+bindkey "^[[B" down-line-or-beginning-search # Down
+
+source $HOME/.dotfiles/zsh/.sources.zsh

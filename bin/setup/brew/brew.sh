@@ -66,57 +66,21 @@ function brew.cask.install() {
 function brew.installer.start() {
   brew tap caskroom/cask
 
-  run "installing caskroom casks"
-  brew.install caskroom/cask/xquartz
-  brew.install caskroom/cask/rstudio
+  run "Installing brew defaults"
+  while read ARG
+    do
+        brew.install "$ARG"
+    done < ./bin/setup/brew/brew_defaults.txt
+
 
   run "tapping new homebrew repositories"
   brew tap homebrew/science
   brew tap caskroom/fonts
 
-  run "installing essential utilities"
-  brew.install git
-  brew.install yarn
-  brew.install gpg
-  brew.install gpg2
-  brew.install libsvg
-  brew.install curl
-  brew.install libxml2
-  brew.install gdal
-  brew.install geos
-  brew.install boost
+    run "Installing cask defaults"
+    while read ARG
+      do
+        brew.cask.install "$ARG"
+      done < ./bin/setup/brew/cask_defaults.txt
 
-  run "installing languages"
-  brew.install R
-  brew.install ruby
-  brew.install python3
-  brew.cask.install java
-
-  run "installing databases"
-  brew.install mongodb
-
-  run "installing zsh"
-  brew.install shpotify
-  brew.install zsh
-  brew.install zsh-completions
-
-
-  run "installing utilities apps"
-  brew.cask.install qlstephen
-  brew.cask.install betterzipql
-  brew.cask.install qlcolorcode
-  brew.cask.install qlprettypatch
-  brew.cask.install quicklook-csv
-  brew.cask.install quicklook-json
-  brew.cask.install font-fira-code
-
-  run "installing core apps"
-  brew.cask.install spotify
-  brew.cask.isntall dashlane
-  brew.cask.isntall evernote
-  brew.cask.install google-chrome
-
-  run "installing devloper apps"
-  brew.cask.install atom
-  brew.cask.install mactex
 }

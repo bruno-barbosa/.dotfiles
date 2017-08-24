@@ -1,0 +1,6 @@
+[submodule "oh-my-zsh"]
+	path = zsh/oh-my-zsh
+	url = https://github.com/robbyrussell/oh-my-zsh
+[submodule "zsh/antigen"]
+	path = zsh/antigen
+	url = https://github.com/zsh-users/antigen/antigen

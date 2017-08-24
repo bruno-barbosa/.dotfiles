@@ -1,0 +1,13 @@
+qlstephen
+betterzipql
+qlcolorcode
+qlprettypatch
+quicklook-csv
+quicklook-json
+font-fira-code
+spotify
+dashlane
+evernote
+google-chrome
+atom
+mactex

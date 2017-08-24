@@ -6,7 +6,7 @@
 ######################################
 
 # include libraries
-source ./bin/setup/.setup.zsh
+source ./bin/setup/setup.sh
 
 bot "Hey there! I'm SimpliBot, \n I will be installing and tweaking your system settings. Let's start..."
 
@@ -50,13 +50,6 @@ rm -rf /Library/Caches/Homebrew/*
 ok
 
 ####
-# Install fonts
-####
-run "installing powerline fonts"
-./zsh/fonts/install.sh
-ok
-
-####
 # Install rvm and its dependencies
 ####
 check.rvm
@@ -79,8 +72,17 @@ ok
 # Move .zscrc file to home directory
 ####
 run "backing up old zshrc file and copying new configurations"
-mv $HOME/.zshrc $HOME/.dotfiles/zsh/.zshrc.bkp
+mv $HOME/.zshrc $HOME/.zshrc.bkp
 ln -s ~/.dotfiles/zsh/.zshrc $HOME
+
+run "backing up old .antigentrc file and copying new configurations"
+mv $HOME/.zshrc $HOME/.antigenrc.bkp
+ln -s ~/.dotfiles/zsh/.antigenrc $HOME
+ok
+
+run "backing up old tmux.conf file and copying new configurations"
+mv $HOME/.zshrc $HOME/.tmux.conf.bkp
+ln -s ~/.dotfiles/tmux/.tmux.conf $HOME
 ok
 
 ####
