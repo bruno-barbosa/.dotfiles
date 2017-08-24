@@ -2,7 +2,6 @@
 export ZSH=$HOME/.dotfiles/zsh/oh-my-zsh
 export DEFAULT_USER="$USER"
 
-ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_MODE='flat'
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_RPROMPT_ON_NEWLINE=true
