@@ -7,7 +7,4 @@
 [submodule "tmux"]
 	path = tmux
 	url = https://github.com/tmux/tmux.git
-[submodule "zsh/oh-my-zsh/powerlevel9k"]
-	path = zsh/oh-my-zsh/custom/themes/powerlevel9k
-	url = https://github.com/bhilburn/powerlevel9k.git
 	
