@@ -2,6 +2,7 @@ caskroom/cask/xquartz
 caskroom/cask/rstudio
 git
 git-extras
+git-flow
 tmux
 yarn
 gpg

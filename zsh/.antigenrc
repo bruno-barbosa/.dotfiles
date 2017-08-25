@@ -6,11 +6,14 @@ antigen bundles <<EOBUNDLES
     # Bundles from the default repo (robbyrussell's oh-my-zsh)
     git
     git-extras
+    git-flow
     tmux
     tmuxinator
     ssh-agent
     virtualenv
     command-not-found
+
+    djui/alias-tips
 
     # Syntax highlighting bundle.
     zsh-users/zsh-syntax-highlighting
