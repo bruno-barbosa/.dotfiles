@@ -17,11 +17,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name=".antigenrc" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".antigenrc" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/zsh/.antigenrc">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="360">
               <caret line="15" column="19" lean-forward="false" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".config.zsh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/bin/configs/.config.zsh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitconfig" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/bin/configs/.gitconfig">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1161">
+              <caret line="33" column="29" lean-forward="false" selection-start-line="33" selection-start-column="29" selection-end-line="33" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/bin/configs/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="8" column="5" lean-forward="false" selection-start-line="8" selection-start-column="5" selection-end-line="8" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -52,26 +82,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="8" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="install.sh" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/install.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="61" column="2" lean-forward="false" selection-start-line="61" selection-start-column="2" selection-end-line="61" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".tmux.conf" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/zsh/tmux/.tmux.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="384">
-              <caret line="16" column="0" lean-forward="true" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -116,7 +126,6 @@
         <option value="$PROJECT_DIR$/tmux/.tmux.conf" />
         <option value="$PROJECT_DIR$/.gitmodules" />
         <option value="$PROJECT_DIR$/bin/configs/.gitconfig" />
-        <option value="$PROJECT_DIR$/bin/configs/.gitignore" />
         <option value="$PROJECT_DIR$/test.json" />
         <option value="$PROJECT_DIR$/zsh/aliases/.python.alias.zsh" />
         <option value="$PROJECT_DIR$/bin/setup/rvm.sh" />
@@ -132,6 +141,7 @@
         <option value="$PROJECT_DIR$/zsh/tmux/.tmux.conf" />
         <option value="$PROJECT_DIR$/bin/setup/brew/brew_defaults.txt" />
         <option value="$PROJECT_DIR$/zsh/.antigenrc" />
+        <option value="$PROJECT_DIR$/bin/configs/.gitignore" />
       </list>
     </option>
   </component>
@@ -169,6 +179,17 @@
             <path>
               <item name=".dotfiles" type="b2602c69:ProjectViewProjectNode" />
               <item name=".dotfiles" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name=".dotfiles" type="b2602c69:ProjectViewProjectNode" />
+              <item name=".dotfiles" type="462c0819:PsiDirectoryNode" />
+              <item name="bin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name=".dotfiles" type="b2602c69:ProjectViewProjectNode" />
+              <item name=".dotfiles" type="462c0819:PsiDirectoryNode" />
+              <item name="bin" type="462c0819:PsiDirectoryNode" />
+              <item name="configs" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -314,12 +335,12 @@
       <workItem from="1503467131435" duration="17898000" />
       <workItem from="1503627389003" duration="6102000" />
       <workItem from="1503640583883" duration="230000" />
-      <workItem from="1503640826994" duration="1131000" />
+      <workItem from="1503640826994" duration="1529000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27018000" />
+    <option name="totallyTimeSpent" value="27416000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1720" y="23" width="1720" height="1412" extended-state="0" />
@@ -532,13 +553,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bin/configs/.zshrc" />
-    <entry file="file://$PROJECT_DIR$/bin/configs/.config.zsh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/zsh/oh-my-zsh/plugins/cask/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -595,20 +609,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="456">
           <caret line="19" column="2" lean-forward="true" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bin/configs/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="17" column="52" lean-forward="false" selection-start-line="17" selection-start-column="52" selection-end-line="17" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bin/configs/.gitconfig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="33" column="29" lean-forward="false" selection-start-line="33" selection-start-column="29" selection-end-line="33" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -737,6 +737,30 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="15" column="19" lean-forward="false" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/configs/.config.zsh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/configs/.gitconfig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1161">
+          <caret line="33" column="29" lean-forward="false" selection-start-line="33" selection-start-column="29" selection-end-line="33" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/configs/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="8" column="5" lean-forward="false" selection-start-line="8" selection-start-column="5" selection-end-line="8" selection-end-column="5" />
           <folding />
         </state>
       </provider>

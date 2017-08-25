@@ -5,7 +5,8 @@
 ._*
 # Files that might appear on external disk
 .Spotlight-V100
-.Trashes
+.Trashes\
+.idea
 
 # Windows   taken from: https://github.com/github/gitignore/blob/master/Global/Windows.gitignore
 # ----------------------------------------------------------------------------------------------
