@@ -75,14 +75,9 @@ run "backing up old zshrc file and copying new configurations"
 mv $HOME/.zshrc $HOME/.zshrc.bkp
 ln -s ~/.dotfiles/zsh/.zshrc $HOME
 
-run "backing up old .antigentrc file and copying new configurations"
-mv $HOME/.zshrc $HOME/.antigenrc.bkp
-ln -s ~/.dotfiles/zsh/.antigenrc $HOME
-ok
-
 run "backing up old tmux.conf file and copying new configurations"
-mv $HOME/.zshrc $HOME/.tmux.conf.bkp
-ln -s ~/.dotfiles/tmux/.tmux.conf $HOME
+mv $HOME/.tmux.conf $HOME/.tmux.conf.bkp
+ln -s ~/.dotfiles/zsh/tmux/.tmux.conf $HOME
 ok
 
 ####

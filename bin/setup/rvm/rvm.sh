@@ -19,3 +19,21 @@ function check.rvm() {
       fi
     fi
 }
+
+# gem installer helper function
+function gem.instal() {
+   action "gem install $1 $2"
+   gem install $1 $2
+    if [[ $? != 0 ]]; then
+        error "failed to install $1! aborting..."
+    fi
+ok
+}
+
+function gem.install.start() {
+    run "Installing gem defaults"
+    while read "$ARG"
+        do
+            gem.install "$ARG"
+        done < ./bin/setup/rvm/gem_defaults.txt
+}
