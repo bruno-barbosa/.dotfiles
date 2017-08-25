@@ -7,6 +7,7 @@ antigen bundles <<EOBUNDLES
     git
     git-extras
     tmux
+    tmuxinator
     ssh-agent
     virtualenv
     command-not-found
