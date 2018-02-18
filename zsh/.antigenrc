@@ -25,18 +25,7 @@ antigen bundles <<EOBUNDLES
     zsh-users/zsh-completions
 
 
-    # OS specific plugins
-    if [[ $CURRENT_OS == 'OS X' ]]; then
-            osx
-    elif [[ $CURRENT_OS == 'Linux' ]]; then
-        # None so far...
 
-        if [[ $DISTRO == 'CentOS' ]]; then
-            centos
-        fi
-    elif [[ $CURRENT_OS == 'Cygwin' ]]; then
-        cygwin
-    fi
 EOBUNDLES
 
 antigen theme bhilburn/powerlevel9k powerlevel9k
