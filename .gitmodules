@@ -7,4 +7,3 @@
 [submodule "tmux"]
 	path = tmux
 	url = https://github.com/tmux/tmux.git
-	
