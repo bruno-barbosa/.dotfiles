@@ -74,10 +74,10 @@ POWERLEVEL9K_TIME_BACKGROUND="black"
 POWERLEVEL9K_TIME_FOREGROUND="249"
 POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S} \UE12E"
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( 'os_icon' 'context' 'dir' 'dir_writable' 'nvmShowVersion' 'rvmShowVersion' 'virtualenv' 'vcs')
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('status' 'zshSpotify' 'ram' 'battery' 'time')
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('status' 'ram' 'battery' 'time')
 
 # Uncomment the following line to use case-sensitive completion.
-CASE_SENSITIVE="false"
+#CASE_SENSITIVE="false"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
@@ -150,8 +150,6 @@ export SSH_KEY_PATH="~/.ssh/bruno@barbosa.io"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export NVM_DIR="/Users/bruno/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # Better history
 # Credits to https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
