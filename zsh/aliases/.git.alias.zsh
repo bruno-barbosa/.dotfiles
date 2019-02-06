@@ -1,6 +1,7 @@
 # GIT ALIASES
 
 # general git aliases
+alias git commit='git cz'
 alias gnt='git init'
 alias gcl='git clone'
 alias glt='git log --graph --oneline --all'
