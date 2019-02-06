@@ -1,4 +1,3 @@
-caskroom/cask/xquartz
 caskroom/cask/rstudio
 git
 git-extras
@@ -16,9 +15,6 @@ boost
 R
 gcc
 automake
-ruby
-python
-python3
-shpotify
+pyenv
 zsh
 zsh-completions

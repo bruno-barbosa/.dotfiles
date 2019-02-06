@@ -10,4 +10,3 @@ dashlane
 evernote
 google-chrome
 atom
-mactex
