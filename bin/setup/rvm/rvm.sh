@@ -21,7 +21,7 @@ function check.rvm() {
 }
 
 # gem installer helper function
-function gem.instal() {
+function gem.install() {
    action "gem install $1 $2"
    gem install $1 $2
     if [[ $? != 0 ]]; then
@@ -30,9 +30,9 @@ function gem.instal() {
 ok
 }
 
-function gem.install.start() {
+function gem.installer.start() {
     run "Installing gem defaults"
-    while read "$ARG"
+    while read ARG
         do
             gem.install "$ARG"
         done < ./bin/setup/rvm/gem_defaults.txt

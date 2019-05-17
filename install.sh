@@ -8,7 +8,7 @@
 # include libraries
 source ./bin/setup/setup.sh
 
-bot "Hey there! I'm SimpliBot, \n I will be installing and tweaking your system settings. Let's start..."
+bot "Hey there! I'm Eros, \n I will be installing and tweaking your system settings. Let's start..."
 
 # Request administrator rights
 if sudo grep -q "# %wheel ALL=(ALL) NOPASSWD: ALL" "/etc/sudoers"; then
@@ -50,25 +50,6 @@ rm -rf /Library/Caches/Homebrew/*
 ok
 
 ####
-# Install rvm and its dependencies
-####
-check.rvm
-ok
-
-####
-# Install rvm and its dependencies
-####
-check.nvm
-ok
-
-####
-# Setting up R and enabling rJava support
-####
-run "setting up R and enabling rJava support"
-R CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers
-ok
-
-####
 # Move .zscrc file to home directory
 ####
 run "backing up old zshrc file and copying new configurations"
@@ -78,6 +59,33 @@ ln -s ~/.dotfiles/zsh/.zshrc $HOME
 run "backing up old tmux.conf file and copying new configurations"
 mv $HOME/.tmux.conf $HOME/.tmux.conf.bkp
 ln -s ~/.dotfiles/tmux/.tmux.conf $HOME
+ok
+
+####
+# Install rvm and its dependencies
+####
+check.rvm
+gem.installer.start
+ok
+
+####
+# Install nvm and its dependencies
+####
+check.nvm
+ok
+
+####
+# Install pyenv and its dependencies
+####
+check.py
+py.installer.start
+ok
+
+####
+# Setting up R and enabling rJava support
+####
+run "setting up R and enabling rJava support"
+R CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers
 ok
 
 ####

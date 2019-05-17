@@ -1,4 +1,3 @@
-
 #  Android SDK home
 export ANDROID_HOME="~/Library/Android/sdk"
 
@@ -8,14 +7,21 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 # NVM environments
 export NVM_DIR="$HOME/.nvm"
 
-# PYENV environments
-export PYENV_ROOT=$HOME/.pyenv
-
-# GO environments priority path
+# GO environments
 export GOPATH=$HOME/.go
 
-# NVM
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+# NVM Environments
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 
-# Pyenv
-eval "$(pyenv init -)"
+# Python Environments
+export PYENV_ROOT=$HOME/.pyenv
+export WORKON_HOME=$HOME/.virtualenvs
+
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+  source /usr/local/bin/virtualenvwrapper.sh
+fi
+
+if [ command -v pyenv ] 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  pyenv virtualenvwrapper_lazy
+fi
