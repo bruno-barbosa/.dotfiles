@@ -77,7 +77,7 @@ ln -s ~/.dotfiles/zsh/.zshrc $HOME
 
 run "backing up old tmux.conf file and copying new configurations"
 mv $HOME/.tmux.conf $HOME/.tmux.conf.bkp
-ln -s ~/.dotfiles/zsh/tmux/.tmux.conf $HOME
+ln -s ~/.dotfiles/tmux/.tmux.conf $HOME
 ok
 
 ####

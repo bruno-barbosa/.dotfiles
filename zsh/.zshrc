@@ -53,10 +53,6 @@ POWERLEVEL9K_LOAD_CRITICAL_VISUAL_IDENTIFIER_COLOR="red"
 POWERLEVEL9K_LOAD_WARNING_VISUAL_IDENTIFIER_COLOR="yellow"
 POWERLEVEL9K_LOAD_NORMAL_VISUAL_IDENTIFIER_COLOR="green"
 
-POWERLEVEL9K_RAM_BACKGROUND="black"
-POWERLEVEL9K_RAM_FOREGROUND="249"
-POWERLEVEL9K_RAM_ELEMENTS=(ram_free)
-
 POWERLEVEL9K_BATTERY_LOW_BACKGROUND="black"
 POWERLEVEL9K_BATTERY_CHARGING_BACKGROUND="black"
 POWERLEVEL9K_BATTERY_CHARGED_BACKGROUND="black"
@@ -74,7 +70,7 @@ POWERLEVEL9K_TIME_BACKGROUND="black"
 POWERLEVEL9K_TIME_FOREGROUND="249"
 POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S} \UE12E"
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( 'os_icon' 'context' 'dir' 'dir_writable' 'nvmShowVersion' 'rvmShowVersion' 'virtualenv' 'vcs')
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('status' 'ram' 'battery' 'time')
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('status' 'battery' 'time')
 
 # Uncomment the following line to use case-sensitive completion.
 #CASE_SENSITIVE="false"
@@ -109,7 +105,11 @@ COMPLETION_WAITING_DOTS="true"
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="yyyy-mm-dd"
+HISTFILE="${HOME}/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -160,7 +160,5 @@ zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
 
+source $HOME/.dotfiles/zsh/.path.zsh
 source $HOME/.dotfiles/zsh/.sources.zsh
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"

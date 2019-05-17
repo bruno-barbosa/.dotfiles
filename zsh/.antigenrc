@@ -15,7 +15,7 @@ antigen bundles <<EOBUNDLES
 
     djui/alias-tips
 
-    # Syntax highlighting bundle.
+    # Syntax highlighting bundle.w
     zsh-users/zsh-syntax-highlighting
 
     # Fish-like auto suggestions

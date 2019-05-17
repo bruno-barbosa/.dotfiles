@@ -88,7 +88,7 @@ function calc() {
 }
 
 function update() {
-	if [ $1 = 'zsh' ]; then
+	if [ $1 == 'zsh' ]; then
 		(
 			git clone https://github.com/bhilburn/powerlevel9k.git ~/.dotfiles/zsh/.oh-my-zsh/custom/themes/powerlevel9k
 		);

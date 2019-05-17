@@ -9,4 +9,3 @@ spotify
 dashlane
 evernote
 google-chrome
-atom
