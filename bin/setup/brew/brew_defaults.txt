@@ -3,7 +3,6 @@ automake
 awscli
 boost
 caskroom/cask/rstudio
-curlu
 gcc
 gdal
 geos
