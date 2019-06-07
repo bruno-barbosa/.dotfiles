@@ -14,6 +14,8 @@ function check.py() {
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python get-pip.py
     rm -rf get-pip.py
+    rm -rf /usr/local/bin/pip # override python2 pip with python3's version
+    ln -s $(which pip3) /usr/local/bin/pip
   fi
 
   run "upgrade global pip to latest"
