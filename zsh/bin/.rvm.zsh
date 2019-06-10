@@ -15,5 +15,5 @@ prompt_rvmShowVersion() {
       fi
     break
     fi
-  done
+  done > /dev/null 2>&1
 }
