@@ -1,7 +1,6 @@
 dashlane
 docker  
 evernote
-font-fira-code
 google-chrome
 java
 qlcolorcode

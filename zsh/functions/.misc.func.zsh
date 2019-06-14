@@ -104,3 +104,18 @@ function update() {
 		)
 	fi;
 }
+
+# function go () { 
+#     if builtin cd "$@"
+#     then
+#         if [[ "$PWD" =~ /(qa|production)(/|$) ]]
+#         then
+#             export APPLICATION_ENV="${BASH_REMATCH[1]}"
+#         else
+#             unset APPLICATION_ENV
+#         fi
+#         return 0
+#     else
+#         return $?
+#     fi
+# }

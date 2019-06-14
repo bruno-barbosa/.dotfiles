@@ -163,3 +163,6 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 
 source $HOME/.dotfiles/zsh/.path.zsh
 source $HOME/.dotfiles/zsh/.sources.zsh
+
+export NVM_DIR="/Users/bruno.barbosa/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
