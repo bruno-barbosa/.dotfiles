@@ -2,16 +2,28 @@
 
 POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/bhilburn/powerlevel9k
 
+antigen use oh-my-zsh
+
 antigen bundles <<EOBUNDLES
     # Bundles from the default repo (robbyrussell's oh-my-zsh)
+    brew
+    command-not-found
+    common-alias
+    docker
+    docker-compose
     git
     git-extras
     git-flow
+    golang
+    npm
+    nvm
+    python
+    ssh-agent
+    StackExchange/blackbox
+    tmux
     tmux
     tmuxinator
-    ssh-agent
     virtualenv
-    command-not-found
 
     djui/alias-tips
 
@@ -28,6 +40,6 @@ antigen bundles <<EOBUNDLES
 
 EOBUNDLES
 
-antigen theme bhilburn/powerlevel9k powerlevel9k
+antigen theme romkatv/powerlevel10k
 
 antigen apply

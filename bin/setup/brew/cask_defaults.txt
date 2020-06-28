@@ -1,6 +1,6 @@
-dashlane
 docker  
 evernote
+font-fira-code-nerd-font
 google-chrome
 java
 qlcolorcode
@@ -9,4 +9,3 @@ qlstephen
 quicklook-csv
 quicklook-json
 spotify
-vagrant

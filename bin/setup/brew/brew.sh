@@ -60,7 +60,6 @@ function brew.cask.install() {
   ok
 }
 
-
 # Add brew and brew cask installations here
 # TODO: implement function to install from a json file
 function brew.installer.start() {
@@ -75,7 +74,7 @@ function brew.installer.start() {
 
   run "tapping new homebrew repositories"
   brew tap homebrew/science
-  brew tap caskroom/fonts
+  brew tap homebrew/cask-fonts
 
     run "Installing cask defaults"
     while read ARG
@@ -84,3 +83,4 @@ function brew.installer.start() {
       done < ./bin/setup/brew/cask_defaults.txt
 
 }
+

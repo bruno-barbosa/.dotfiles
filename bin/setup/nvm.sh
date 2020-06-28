@@ -10,7 +10,7 @@ function check.nvm() {
   nvm_bin=$(nvm --version) 2>&1 > /dev/null
   if [[ $? != 0 ]]; then
     action "installing nvm"
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.4/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
       if [[ $? != 0 ]]; then
         error "unable to install nvm, script $0 abort!"
         exit 2
