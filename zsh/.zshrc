@@ -1,6 +1,7 @@
 source $HOME/.dotfiles/zsh/.path.zsh
 source $HOME/.dotfiles/zsh/.sources.zsh
 
+# Path to your oh-my-zsh installation.
 export DEFAULT_USER="$USER"
 
 POWERLEVEL9K_MODE='nerdfont-complete'
