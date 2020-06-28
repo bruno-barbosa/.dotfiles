@@ -1,7 +1,6 @@
 source $HOME/.dotfiles/zsh/.path.zsh
 source $HOME/.dotfiles/zsh/.sources.zsh
 
-# Path to your oh-my-zsh installation.
 export DEFAULT_USER="$USER"
 
 POWERLEVEL9K_MODE='nerdfont-complete'
@@ -49,7 +48,7 @@ POWERLEVEL9K_OS_ICON_FOREGROUND='cyan'
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status go_version nvm os_icon)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status virtualenv go_version rvm nvm os_icon)
 POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=''
 POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%F{008}\uf104%F{008}'
 

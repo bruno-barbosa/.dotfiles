@@ -36,8 +36,6 @@ antigen bundles <<EOBUNDLES
     # Extra zsh completions
     zsh-users/zsh-completions
 
-
-
 EOBUNDLES
 
 antigen theme romkatv/powerlevel10k

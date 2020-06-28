@@ -125,6 +125,3 @@
   enabled = true
 [include]
   path = .gitconfig.user
-[user]
-  name = "Bruno Barbosa"
-	email = bruno@barbosa.io
