@@ -21,7 +21,7 @@ antigen bundles <<EOBUNDLES
     ssh-agent
     StackExchange/blackbox
     tmux
-    tmux
+    osx
     tmuxinator
     virtualenv
 

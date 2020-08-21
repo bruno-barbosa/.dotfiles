@@ -15,13 +15,9 @@ export GOPATH=$HOME/.go
 
 # Python Environments
 export PYENV_ROOT=$HOME/.pyenv
-export WORKON_HOME=$HOME/.virtualenvs
 
-if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
-  source /usr/local/bin/virtualenvwrapper.sh
-fi
 
-if [ command -v pyenv ] 1>/dev/null 2>&1; then
+if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
-  pyenv virtualenvwrapper_lazy
+  eval "$(pyenv virtualenv-init -)"
 fi
