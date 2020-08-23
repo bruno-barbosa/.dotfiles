@@ -11,5 +11,3 @@ source $ZSH_PATH/bin/.tmuxinator.zsh
 source $ZSH_PATH/bin/.gitpair.zsh
 source $ZSH_PATH/aliases/.aliases.zsh
 source $ZSH_PATH/functions/.functions.zsh
-
-# source $HOME/.gvm/scripts/gvm
