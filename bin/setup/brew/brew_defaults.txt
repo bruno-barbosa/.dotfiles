@@ -4,7 +4,6 @@ git
 git-extras
 git-flow
 pyenv
-pyenv
 tmux
 yarn
 zsh
