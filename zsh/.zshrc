@@ -12,6 +12,8 @@ fi
 
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_COLORIZE_TOOL="chroma"
+ZSH_COLORIZE_STYLE="colorful"
 
 # Uncomment the following line to use case-sensitive completion.
 #CASE_SENSITIVE="false"
@@ -60,13 +62,31 @@ setopt appendhistory
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  git
+  aws
   bundler
+  colorize
+  command-not-found
+  common-aliases
+  docker
   dotenv
+  git
+  git-extras
+  git-flow
+  golang
   macos
+  npm
+  nvm
+  pyenv
+  python
   rake
   rbenv
   ruby
+  ssh
+  ssh-agent
+  sudo
+  terraform
+  zsh-autosuggestions
+  zsh-syntax-highlighting
 )
 
 # User configuration
@@ -111,3 +131,4 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 source $ZSH/oh-my-zsh.sh
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+

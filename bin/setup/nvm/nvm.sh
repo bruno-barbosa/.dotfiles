@@ -7,6 +7,7 @@
 
 function check.nvm() {
   run "checking nvm installation"
+  export NVM_DIR="$HOME/.nvm"
   nvm_bin=$(nvm --version) 2>&1 >/dev/null
   if [[ $? != 0 ]]; then
     action "installing nvm"
@@ -16,7 +17,6 @@ function check.nvm() {
       exit 2
     else
       nvm install --lts
-      ok
     fi
   fi
 }

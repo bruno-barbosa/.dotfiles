@@ -18,10 +18,8 @@ function check.brew() {
       exit 2
     fi
   else
-    ok
     run "updating homebrew"
     brew update
-    ok
     bot "before installing brew packages, can I upgrade outdated packages?"
     read -r -p "run brew upgrade? [y|N]" response
     if [[ $response =~ ^(y|yes|Y) ]]; then
@@ -44,7 +42,6 @@ function brew.install() {
       error "failed to install $1! aborting..."
     fi
   fi
-  ok
 }
 
 # brew cask installer helper function
@@ -58,26 +55,28 @@ function brew.cask.install() {
       error "failed to install $1! aborting..."
     fi
   fi
-  ok
 }
 
 # Add brew and brew cask installations here
 # TODO: implement function to install from a json file
 function brew.installer.start() {
-  brew tap caskroom/cask
+  brew tap homebrew/cask
 
-  run "Installing brew defaults"
-  while read ARG; do
-    brew.install "$ARG"
-  done <./bin/setup/brew/brew_defaults.txt
+  if [[ -s ./bin/setup/brew/brew_defaults.txt ]]; then
+    run "Installing brew defaults"
+    while read ARG; do
+      brew.install "$ARG"
+    done <./bin/setup/brew/brew_defaults.txt
+  else
+    warn "no brew defaults found skipping... \n"
+  fi
 
-  run "tapping new homebrew repositories"
-  brew tap homebrew/science
-  brew tap homebrew/cask-fonts
-
-  run "Installing cask defaults"
-  while read ARG; do
-    brew.cask.install "$ARG"
-  done <./bin/setup/brew/cask_defaults.txt
-
+  if [[ -s ./bin/setup/brew/cask_defaults.txt ]]; then
+    run "Installing cask defaults"
+    while read ARG; do
+      brew.cask.install "$ARG"
+    done <./bin/setup/brew/cask_defaults.txt
+  else
+    warn "no cask defaults found skipping... \n"
+  fi
 }

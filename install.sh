@@ -43,28 +43,30 @@ fi
 # Install brew and its dependencies
 # add new brew && cask installations here
 ####
-run "checking brew installation & installing brew cask"
+action "checking brew installation & installing brew cask"
 check.brew
 brew.installer.start
 ok
 
-run "cleaning up brew & cask"
+action "cleaning up brew & cask"
 brew cleanup --force
 rm -rf /Library/Caches/Homebrew/*
 ok
 
-run "installing oh-my-zsh"
+action "installing oh-my-zsh"
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ok
 
 ####
 # Move .zscrc file to home directory
 ####
-run "backing up old zshrc file and copying new configurations"
+action "backing up old zshrc file and copying new configurations"
 mv $HOME/.zshrc $HOME/.zshrc.bkp
 ln -s ~/.dotfiles/zsh/.zshrc $HOME
 
-run "backing up old tmux.conf file and copying new configurations"
+action "backing up old tmux.conf file and copying new configurations"
 mv $HOME/.tmux.conf $HOME/.tmux.conf.bkp
 ln -s ~/.dotfiles/tmux/.tmux.conf $HOME
 ok
@@ -92,6 +94,7 @@ ok
 ####
 # Setting up R and enabling rJava support
 ####
+action
 run "setting up R and enabling rJava support"
 R CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers
 ok
@@ -99,6 +102,7 @@ ok
 ####
 # Configure .gitconfig file
 ####
+action
 run "initiating git.config configuration"
 git.config
 ok
