@@ -1,3 +1,8 @@
+export ZSH="$HOME/.oh-my-zsh"
+
+source $HOME/.dotfiles/zsh/.path.zsh
+source $HOME/.dotfiles/zsh/.sources.zsh
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -5,79 +10,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-source $HOME/.dotfiles/zsh/.path.zsh
-source $HOME/.dotfiles/zsh/.sources.zsh
 
-# Path to your oh-my-zsh installation.
-export DEFAULT_USER="$USER"
-
-POWERLEVEL9K_MODE='nerdfont-complete'
-
-POWERLEVEL9K_DIR_BACKGROUND='237'
-POWERLEVEL9K_CUSTOM_GIT_PAIR="echo \$(sp)"
-POWERLEVEL9K_CUSTOM_GIT_PAIR_BACKGROUND="clear"
-POWERLEVEL9K_CUSTOM_GIT_PAIR_FOREGROUND="blue"
-POWERLEVEL9K_CUSTOM_GIT_PAIR_ICON="\uf7af"
-POWERLEVEL9K_DIR_DEFAULT_BACKGROUND="clear"
-POWERLEVEL9K_DIR_DEFAULT_FOREGROUND="012"
-POWERLEVEL9K_DIR_FOREGROUND='010'
-POWERLEVEL9K_DIR_HOME_BACKGROUND="clear"
-POWERLEVEL9K_DIR_HOME_FOREGROUND="012"
-POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND="clear"
-POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND="012"
-POWERLEVEL9K_DIR_PATH_SEPARATOR="%F{008}/%F{cyan}"
-
-POWERLEVEL9K_DIR_ETC_BACKGROUND="clear"
-POWERLEVEL9K_ETC_ICON='%F{blue}\uf423'
-POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_FOREGROUND="red"
-POWERLEVEL9K_DIR_WRITABLE_FORBIDDEN_BACKGROUND="clear"
-
-POWERLEVEL9K_GO_ICON="\uf7b7"
-POWERLEVEL9K_GO_VERSION_BACKGROUND='clear'
-POWERLEVEL9K_GO_VERSION_FOREGROUND='081'
-
-POWERLEVEL9K_HOME_ICON="\ufb26"
-
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir dir_writable_joined custom_git_pair vcs_joined)
-POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='%F{008}\uf460%F{008}'
-
-POWERLEVEL9K_LINUX_MANJARO_ICON="\uf312 "
-POWERLEVEL9K_LINUX_UBUNTU_ICON="\uf31b "
-
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=" \uf101 "
-
-POWERLEVEL9K_NVM_BACKGROUND='clear'
-POWERLEVEL9K_NVM_FOREGROUND='green'
-
-POWERLEVEL9K_OS_ICON_BACKGROUND='clear'
-POWERLEVEL9K_OS_ICON_FOREGROUND='cyan'
-
-POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status pyenv go_version rvm nvm os_icon)
-POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=''
-POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%F{008}\uf104%F{008}'
-
-POWERLEVEL9K_SHORTEN_DELIMITER='%F{008} …%F{008}'
-POWERLEVEL9K_SHORTEN_DIR_LENGTH=3
-POWERLEVEL9K_SHORTEN_STRATEGY="none"
-
-POWERLEVEL9K_STATUS_ERROR_BACKGROUND="clear"
-POWERLEVEL9K_STATUS_ERROR_FOREGROUND="001"
-POWERLEVEL9K_STATUS_OK_BACKGROUND="clear"
-POWERLEVEL9K_STATUS_BACKGROUND="clear"
-POWERLEVEL9K_CARRIAGE_RETURN_ICON="\uf071"
-
-POWERLEVEL9K_TIME_FORMAT="%D{%H:%M \uE868  %d.%m}"
-
-POWERLEVEL9K_VCS_CLEAN_BACKGROUND='clear'
-POWERLEVEL9K_VCS_CLEAN_FOREGROUND='green'
-POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='clear'
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='yellow'
-POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='clear'
-POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='green'
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Uncomment the following line to use case-sensitive completion.
 #CASE_SENSITIVE="false"
@@ -125,7 +59,15 @@ setopt appendhistory
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-#plugins=(osx, git, git-extras, command-not-found, ssh-agent, virtualenv, virtualvwrapper)
+plugins=(
+  git
+  bundler
+  dotenv
+  macos
+  rake
+  rbenv
+  ruby
+)
 
 # User configuration
 
@@ -145,8 +87,7 @@ export LANG=en_US.UTF-8
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# ssh
-export SSH_KEY_PATH="~/.ssh/bruno@barbosa.io"
+
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -167,6 +108,6 @@ zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
 
+source $ZSH/oh-my-zsh.sh
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
