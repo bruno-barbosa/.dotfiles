@@ -3,13 +3,6 @@ export ZSH="$HOME/.oh-my-zsh"
 source $HOME/.dotfiles/zsh/.path.zsh
 source $HOME/.dotfiles/zsh/.sources.zsh
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
 ZSH_COLORIZE_TOOL="chroma"
@@ -75,7 +68,6 @@ plugins=(
   golang
   macos
   npm
-  nvm
   pyenv
   python
   rake
@@ -85,6 +77,7 @@ plugins=(
   ssh-agent
   sudo
   terraform
+  volta
   zsh-autosuggestions
   zsh-syntax-highlighting
 )
@@ -130,5 +123,11 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 
 source $ZSH/oh-my-zsh.sh
 
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
