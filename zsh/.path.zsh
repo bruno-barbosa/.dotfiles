@@ -8,3 +8,4 @@ export PATH=$HOME/.rvm/bin:$PATH
 export PATH=$HOME/.pyenv/bin:$PATH
 
 export PATH=$HOME/.go/bin:$PATH
+export PATH=$HOME/go/bin:$PATH

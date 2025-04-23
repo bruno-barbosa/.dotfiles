@@ -1,5 +1,7 @@
 # set your user tokens as environment variables, such as ~/.secrets
 # See the README for examples.
+[init]
+  defaultBranch = main              # set the default branch to main
 [color]
   ui = true
 [color "branch"]
