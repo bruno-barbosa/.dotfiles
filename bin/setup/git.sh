@@ -75,7 +75,7 @@ function git.config() {
       sed -i 's/GITHUBUSER/'$githubuser'/' ./bin/.gitconfig;
     fi
     run "copying gitconfig to home directory"
-    mv ./bin/.gitconfig $HOME
+    ln -s ~/.dotfiles/zsh/.gitconfig $HOME
   fi
 
 }

@@ -1,0 +1,9 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Bruno Barbosa
+	email = bruno.barbosa@minted.com
+# Please adapt and uncomment the following lines:
+#	name = Bruno Barbosa
+#	email = bruno.barbosa@minted.com
+[pull]
+	rebase = true
