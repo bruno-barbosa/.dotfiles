@@ -131,3 +131,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Created by `pipx` on 2025-06-30 23:08:24
+export PATH="$PATH:/Users/bruno.barbosa/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
