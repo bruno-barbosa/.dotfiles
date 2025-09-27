@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Search commits by message
+
+if [[ -z "$1" ]]; then
+  echo "Usage: git search <search-term>"
+  exit 1
+fi
+
+git log --all --grep="$1" --oneline --graph

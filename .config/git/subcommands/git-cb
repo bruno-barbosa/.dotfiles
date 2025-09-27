@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Create a new branch and switch to it
+
+if [[ -z "$1" ]]; then
+  echo "Usage: git cb <branch-name>"
+  exit 1
+fi
+
+git checkout -b "$1"

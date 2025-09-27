@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Add all current changes to the last commit
+
+git add --all
+git commit --amend --no-edit
+echo "✓ Changes added to last commit"

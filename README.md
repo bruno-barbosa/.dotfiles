@@ -227,4 +227,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ for developers who value automated, consistent development environments across platforms.**
+**Made with ❤️ for developers who values automation.**

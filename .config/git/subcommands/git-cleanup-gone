@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Delete local branches tracking deleted remote branches
+
+echo "Deleting local branches tracking deleted remote branches..."
+git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -n 1 -r git branch -D
+echo "✓ Cleanup complete!"

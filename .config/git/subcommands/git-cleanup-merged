@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Delete local branches that have been merged into main/master
+
+# Get the main branch name (main or master)
+_git_main_branch() {
+  if git rev-parse --git-dir > /dev/null 2>&1; then
+    for branch in main master; do
+      if git show-ref -q --verify refs/heads/$branch; then
+        echo $branch
+        return
+      fi
+    done
+    echo "main"
+  fi
+}
+
+main_branch=$(_git_main_branch)
+echo "Cleaning up branches merged into $main_branch..."
+
+git branch --merged $main_branch | \
+  grep -v "^\*" | \
+  grep -v "^  $main_branch$" | \
+  grep -v "^  develop$" | \
+  xargs -n 1 -r git branch -d
+
+echo "✓ Cleanup complete!"

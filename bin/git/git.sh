@@ -9,13 +9,10 @@ function git_config() {
   # Check if git configuration needs to be set up
   local needs_config=false
 
-  # Check for placeholder values
-  if grep -q 'user = GITHUBUSER\|GITHUBEMAIL\|GITHUBFULLNAME' ./.config/.gitconfig 2>/dev/null; then
-    needs_config=true
-  # Check if git config exists but ask user if they want to reconfigure
-  elif [[ -f ./.config/.gitconfig ]] && git config --file ./.config/.gitconfig user.name >/dev/null 2>&1; then
-    local current_name=$(git config --file ./.config/.gitconfig user.name 2>/dev/null)
-    local current_email=$(git config --file ./.config/.gitconfig user.email 2>/dev/null)
+  # Check if git config user file exists and ask user if they want to reconfigure
+  if [[ -f ./.config/git/.gitconfig.user ]] && git config --file ./.config/git/.gitconfig.user user.name >/dev/null 2>&1; then
+    local current_name=$(git config --file ./.config/git/.gitconfig.user user.name 2>/dev/null)
+    local current_email=$(git config --file ./.config/git/.gitconfig.user user.email 2>/dev/null)
 
     if [[ -n "$current_name" && -n "$current_email" ]]; then
       bot "Git is already configured with:"
@@ -92,24 +89,21 @@ function git_config() {
     fi
 
 
-    run "replacing items in .gitconfig with your info ($COL_YELLOW$fullname, $email, $githubuser$COL_RESET)"
+    run "creating user-specific git configuration ($COL_YELLOW$fullname, $email, $githubuser$COL_RESET)"
 
-    # test if gnu-sed or osx sed
+    # Create .gitconfig.user with user credentials
+    cat > ./.config/git/.gitconfig.user << EOF
+# User-specific git configuration
+# This file is not committed to the repository
 
-    sed -i "s/GITHUBFULLNAME/$firstname $lastname/" ./.config/.gitconfig > /dev/null 2>&1
-    local sed_status=$?
-    if [[ $sed_status != 0 ]]; then
-      echo
-      run "looks like you are using OSX sed rather than gnu-sed, accommodating"
-      sed -i '' "s/GITHUBFULLNAME/$firstname $lastname/" ./.config/.gitconfig;
-      sed -i '' 's/GITHUBEMAIL/'$email'/' ./.config/.gitconfig;
-      sed -i '' 's/GITHUBUSER/'$githubuser'/' ./.config/.gitconfig;
-    else
-      echo
-      bot "looks like you are already using gnu-sed. woot!"
-      sed -i 's/GITHUBEMAIL/'$email'/' ./.config/.gitconfig;
-      sed -i 's/GITHUBUSER/'$githubuser'/' ./.config/.gitconfig;
-    fi
+[user]
+  name = $firstname $lastname
+  email = $email
+
+[github]
+  user = $githubuser
+EOF
+    ok "User-specific git configuration created"
     run "linking gitconfig to home directory"
     # Remove existing .gitconfig if it exists
     if [ -L "$HOME/.gitconfig" ]; then
@@ -118,22 +112,29 @@ function git_config() {
       mv "$HOME/.gitconfig" "$HOME/.gitconfig.backup"
       echo "Existing .gitconfig backed up to .gitconfig.backup"
     fi
-    ln -s ~/.dotfiles/.config/.gitconfig "$HOME/.gitconfig"
+    ln -s ~/.dotfiles/.config/git/.gitconfig "$HOME/.gitconfig"
     ok "Global gitconfig linked to ~/.gitconfig"
   fi
 
   # Always ensure .gitconfig is linked to home directory (even if not reconfiguring)
   run "ensuring gitconfig is linked to home directory"
-  if [ ! -L "$HOME/.gitconfig" ] || [ "$(readlink "$HOME/.gitconfig")" != "$HOME/.dotfiles/.config/.gitconfig" ]; then
+  if [ ! -L "$HOME/.gitconfig" ] || [ "$(readlink "$HOME/.gitconfig")" != "$HOME/.dotfiles/.config/git/.gitconfig" ]; then
     if [ -L "$HOME/.gitconfig" ]; then
       rm "$HOME/.gitconfig"
     elif [ -f "$HOME/.gitconfig" ]; then
       mv "$HOME/.gitconfig" "$HOME/.gitconfig.backup.$(date +%s)"
       run "Existing .gitconfig backed up"
     fi
-    ln -s ~/.dotfiles/.config/.gitconfig "$HOME/.gitconfig"
+    ln -s ~/.dotfiles/.config/git/.gitconfig "$HOME/.gitconfig"
     ok "gitconfig linked to home directory"
   else
     ok "gitconfig already properly linked"
+  fi
+
+  # Ensure git subcommands are executable
+  run "ensuring git subcommands are executable"
+  if [ -d "./.config/git/subcommands" ]; then
+    chmod +x ./.config/git/subcommands/git-* 2>/dev/null
+    ok "git subcommands are executable"
   fi
 }

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Create a new git repository and make initial commit
+
+if [[ -z "$1" ]]; then
+  echo "Usage: git init-repo <repo-name>"
+  exit 1
+fi
+
+repo_name="$1"
+mkdir -p "$repo_name"
+cd "$repo_name"
+
+git init
+echo "# $repo_name" > README.md
+echo "Created: $(date)" >> README.md
+
+# Create basic .gitignore
+cat > .gitignore << 'EOF'
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.log
+EOF
+
+git add README.md .gitignore
+git commit -m "chore: initial commit"
+
+echo "✓ Repository initialized: $repo_name"

@@ -4,6 +4,35 @@
 # Linux package installer
 ######################################
 
+# Configure system locale to avoid warnings
+function setup_locale() {
+  run "Checking locale configuration"
+
+  # Check if en_US.UTF-8 locale exists
+  if locale -a 2>/dev/null | grep -q "en_US.utf8"; then
+    ok "en_US.UTF-8 locale already configured"
+    return 0
+  fi
+
+  action "Generating en_US.UTF-8 locale"
+
+  # Generate the locale
+  if sudo locale-gen en_US.UTF-8 >/dev/null 2>&1; then
+    ok "Locale generated successfully"
+  else
+    warn "Failed to generate locale (may already exist)"
+  fi
+
+  # Update system default locale
+  if sudo update-locale LANG=en_US.UTF-8 >/dev/null 2>&1; then
+    ok "System locale updated to en_US.UTF-8"
+  else
+    warn "Failed to update system locale"
+  fi
+
+  success "Locale configuration complete (restart terminal to apply)"
+}
+
 # Detect Linux distribution (Debian-based only)
 function detect_linux_distro() {
   if [ -f /etc/os-release ]; then
@@ -50,6 +79,9 @@ function unix_install() {
 # Install packages from configuration
 function unix_installer_start() {
   detect_linux_distro
+
+  # Configure locale first to avoid warnings
+  setup_locale
 
   # Load configuration if not already loaded
   if [[ -z "${CONFIG_SETUP_PACKAGES_DEBIAN:-}" ]]; then

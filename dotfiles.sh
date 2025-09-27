@@ -249,7 +249,7 @@ todo_progress "Configure shell environment (zsh + oh-my-zsh)"
 # Install oh-my-zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   run "Installing oh-my-zsh"
-  local error_output
+  error_output=""
   if error_output=$(sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended 2>&1); then
     ok "oh-my-zsh installed successfully"
   else
@@ -268,7 +268,7 @@ fi
 # Install powerlevel10k theme
 if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
   run "Installing powerlevel10k theme"
-  local error_output
+  error_output=""
   if error_output=$(git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" 2>&1); then
     ok "powerlevel10k theme installed successfully"
 
@@ -289,7 +289,7 @@ run "Installing zsh plugins"
 
 # Install zsh-autosuggestions plugin
 if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]; then
-  local error_output
+  error_output=""
   if error_output=$(git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" 2>&1); then
     ok "zsh-autosuggestions plugin installed"
   else
@@ -302,7 +302,7 @@ fi
 
 # Install zsh-syntax-highlighting plugin
 if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]; then
-  local error_output
+  error_output=""
   if error_output=$(git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" 2>&1); then
     ok "zsh-syntax-highlighting plugin installed"
   else

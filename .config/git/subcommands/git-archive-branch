@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Archive current branch to tar.gz
+
+# Get current branch name
+_git_current_branch() {
+  git branch --show-current 2> /dev/null
+}
+
+branch=$(_git_current_branch)
+if [[ -z "$branch" ]]; then
+  echo "Not on a branch"
+  exit 1
+fi
+
+archive_name="${branch}-$(date +%Y%m%d).tar.gz"
+git archive -o "$archive_name" HEAD
+echo "✓ Branch archived to: $archive_name"

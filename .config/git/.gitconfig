@@ -1,9 +1,5 @@
 # Git Configuration
-# User credentials in .gitconfig.user (included at bottom)
-
-[user]
-  name = Bruno Barbosa
-  email = bruno.barbosa@minted.com
+# User credentials will be set in .gitconfig.user (included at bottom)
 
 [init]
   defaultBranch = main
@@ -11,7 +7,8 @@
 [core]
   editor = vim
   autocrlf = false
-  excludesfile = ~/.dotfiles/.config/.gitignore
+  excludesfile = ~/.dotfiles/.config/git/.gitignore
+	hooksPath = /home/bruno/.dotfiles/.config/git/hooks
 
 [pull]
   rebase = true
@@ -37,6 +34,10 @@
 [diff]
   mnemonicprefix = true
   algorithm = patience
+
+[commit]
+  template = ~/.dotfiles/.config/git/.gitmessage
+  verbose = true
 
 [apply]
   whitespace = nowarn
@@ -110,4 +111,4 @@
   snapshots = !git stash list --grep snapshot
 
 [include]
-  path = .gitconfig.user
+  path = ~/.dotfiles/.config/git/.gitconfig.user

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Quick commit with conventional commit format
+
+if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+  echo "Usage: git conv <type> <message> [scope]"
+  echo ""
+  echo "Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert"
+  echo "Example: git conv feat 'add user authentication' api"
+  exit 1
+fi
+
+type="$1"
+message="$2"
+scope="$3"
+
+if [[ -n "$scope" ]]; then
+  git commit -m "$type($scope): $message"
+else
+  git commit -m "$type: $message"
+fi

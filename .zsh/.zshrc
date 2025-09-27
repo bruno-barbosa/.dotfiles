@@ -104,9 +104,6 @@ fi
 
 # User configuration
 
-# export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
@@ -151,6 +148,3 @@ fi
 
 # Load p10k configuration if it exists
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Created by `pipx` - platform-independent local bin path
-export PATH="$HOME/.local/bin:$PATH"

@@ -1,0 +1,13 @@
+# Allow tracking .config directory in this repo (override global gitignore)
+!/.config
+
+# But still ignore user-specific git configuration
+/.config/git/.gitconfig.user
+
+# Ignore errors log
+/errors.log
+
+# Ignore vim swap files
+*.swp
+*.swo
+*~

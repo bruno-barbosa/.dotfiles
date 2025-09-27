@@ -1,0 +1,58 @@
+1# <type>(<scope>): <subject>
+#
+# <body>
+#
+# <footer>
+
+# --- CONVENTIONAL COMMIT TYPES ---
+# feat:     A new feature
+# fix:      A bug fix
+# docs:     Documentation only changes
+# style:    Changes that do not affect the meaning of the code (white-space, formatting, etc)
+# refactor: A code change that neither fixes a bug nor adds a feature
+# perf:     A code change that improves performance
+# test:     Adding missing tests or correcting existing tests
+# build:    Changes that affect the build system or external dependencies
+# ci:       Changes to CI configuration files and scripts
+# chore:    Other changes that don't modify src or test files
+# revert:   Reverts a previous commit
+
+# --- COMMIT MESSAGE GUIDELINES ---
+# 1. Subject line (first line):
+#    - Use imperative mood ("add feature" not "added feature")
+#    - Don't capitalize first letter
+#    - No period at the end
+#    - Limit to 50 characters
+#    - Be concise but descriptive
+#
+# 2. Scope (optional):
+#    - Add in parentheses after type
+#    - Examples: (api), (ui), (auth), (db), (docs)
+#
+# 3. Body (optional):
+#    - Separate from subject with blank line
+#    - Explain what and why vs. how
+#    - Wrap at 72 characters
+#    - Can have multiple paragraphs
+#
+# 4. Footer (optional):
+#    - Reference issues: Closes #123, Fixes #456
+#    - Breaking changes: BREAKING CHANGE: description
+#    - Co-authors: Co-authored-by: Name <email>
+
+# --- EXAMPLES ---
+# feat(auth): add user login functionality
+#
+# Implement JWT-based authentication system with refresh tokens.
+# Users can now log in using email and password.
+#
+# Closes #42
+
+# fix(api): resolve race condition in user creation
+#
+# BREAKING CHANGE: User creation endpoint now requires email verification
+# before account activation.
+
+# docs: update installation instructions
+
+# refactor(db): simplify query builder logic

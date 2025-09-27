@@ -24,9 +24,12 @@ add_to_path "/usr/local/sbin"
 add_to_path "/usr/local/bin"
 add_to_path "$HOME/.local/bin"
 
+# Git subcommands
+add_to_path "$HOME/.dotfiles/.config/git/subcommands"
+
 # Version managers
 add_to_path "$VOLTA_HOME/bin"
-add_to_path "$HOME/.rvm/bin"
+add_to_path "$HOME/.rbenv/bin"
 add_to_path "$HOME/.pyenv/bin"
 
 # Go paths
@@ -57,9 +60,9 @@ if [[ -d "$PYENV_ROOT/bin" ]]; then
   fi
 fi
 
-# RVM initialization (only if installed)
-if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
-  source "$HOME/.rvm/scripts/rvm"
+# rbenv initialization (only if installed)
+if command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - zsh)"
 fi
 
 # GVM initialization (only if installed)

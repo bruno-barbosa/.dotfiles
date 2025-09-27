@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Show repository size and object count
+
+echo "Repository size:"
+git count-objects -vH

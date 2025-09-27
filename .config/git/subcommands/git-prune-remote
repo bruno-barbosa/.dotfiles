@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Prune remote branches that no longer exist
+
+echo "Fetching and pruning remote branches..."
+git fetch --all --prune
+
+# Show branches that are gone on remote
+echo ""
+echo "Branches tracking deleted remote branches:"
+git branch -vv | grep ': gone]' || echo "None found"
+
+echo ""
+echo "To delete these local branches, run: git cleanup-gone"

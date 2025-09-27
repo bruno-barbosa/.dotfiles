@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# Quick status across multiple repos
+
+# Get current branch name
+_git_current_branch() {
+  git branch --show-current 2> /dev/null
+}
+
+repos_dir="${1:-.}"
+echo "Checking git repositories in: $repos_dir"
+echo ""
+
+find "$repos_dir" -maxdepth 2 -name ".git" -type d | while read gitdir; do
+  repo=$(dirname "$gitdir")
+  echo "📁 $(basename $repo):"
+  cd "$repo"
+
+  # Check for uncommitted changes
+  if [[ -n $(git status --porcelain) ]]; then
+    echo "  ⚠️  Uncommitted changes"
+  fi
+
+  # Check for unpushed commits
+  branch=$(_git_current_branch)
+  if [[ -n "$branch" ]]; then
+    unpushed=$(git log origin/$branch..$branch --oneline 2>/dev/null | wc -l)
+    if [[ $unpushed -gt 0 ]]; then
+      echo "  ⬆️  $unpushed unpushed commits"
+    fi
+  fi
+
+  # Check for unpulled commits
+  if [[ -n "$branch" ]]; then
+    git fetch origin $branch 2>/dev/null
+    unpulled=$(git log $branch..origin/$branch --oneline 2>/dev/null | wc -l)
+    if [[ $unpulled -gt 0 ]]; then
+      echo "  ⬇️  $unpulled unpulled commits"
+    fi
+  fi
+
+  cd - > /dev/null
+  echo ""
+done

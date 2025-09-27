@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Find the 20 largest files in git history
+
+echo "Finding largest files in git history..."
+git rev-list --objects --all | \
+  git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
+  sed -n 's/^blob //p' | \
+  sort --numeric-sort --key=2 --reverse | \
+  head -20 | \
+  numfmt --field=2 --to=iec-i --suffix=B --padding=7 --round=nearest

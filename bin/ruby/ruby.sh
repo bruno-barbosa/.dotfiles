@@ -1,131 +1,131 @@
 #!/usr/bin/env bash
 
 ######################################
-# Installs ruby/rvm and its dependencies
+# Installs ruby/rbenv and its dependencies
 ######################################
 
 function check_ruby() {
-  run "Checking RVM installation"
+  run "Checking rbenv installation"
 
-  # Check if RVM is already installed and working
-  if command -v rvm >/dev/null 2>&1 && rvm --version >/dev/null 2>&1; then
-    ok "RVM already installed"
-
-    # Source RVM to ensure it's available in current session
-    if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
-      source "$HOME/.rvm/scripts/rvm"
-    fi
-
+  # Check if rbenv is already installed and working
+  if command -v rbenv >/dev/null 2>&1 && rbenv --version >/dev/null 2>&1; then
+    ok "rbenv already installed"
     return 0
   fi
 
-  action "Installing RVM (Ruby Version Manager)"
+  action "Installing rbenv (Ruby Version Manager)"
 
-  # Install GPG keys (required for Linux/Ubuntu, optional for macOS)
-  if [[ "$IS_LINUX" == "true" ]] || ! command -v gpg >/dev/null 2>&1; then
-    run "Installing RVM GPG keys"
-    local gpg_success=false
+  # Install rbenv
+  run "Downloading and installing rbenv"
 
-    # Try multiple keyservers
-    local keyservers=(
-      "hkp://pgp.mit.edu"
-      "hkp://keys.gnupg.net"
-      "keyserver.ubuntu.com"
-    )
-
-    for keyserver in "${keyservers[@]}"; do
-      if gpg --keyserver "$keyserver" --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB 2>/dev/null; then
-        gpg_success=true
-        ok "GPG keys imported successfully from $keyserver"
-        break
-      fi
-    done
-
-    if [[ "$gpg_success" != "true" ]]; then
-      warn "Failed to import GPG keys, but continuing with RVM installation..."
-    fi
+  if [[ -d "$HOME/.rbenv" ]]; then
+    warn "rbenv directory already exists, updating..."
+    cd "$HOME/.rbenv" && git pull
   else
-    ok "Skipping GPG key installation on macOS (not required)"
+    if git clone https://github.com/rbenv/rbenv.git ~/.rbenv; then
+      ok "rbenv cloned successfully"
+    else
+      error "Failed to clone rbenv"
+      return 1
+    fi
   fi
 
-  # Install RVM
-  run "Downloading and installing RVM"
-  if curl -sSL https://get.rvm.io | bash -s stable; then
-    ok "RVM installation completed"
+  # Add rbenv to PATH for this session
+  export PATH="$HOME/.rbenv/bin:$PATH"
+  eval "$(rbenv init -)"
 
-    # Source RVM immediately
-    if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
-      source "$HOME/.rvm/scripts/rvm"
-      ok "RVM sourced successfully"
+  # Compile dynamic bash extension (optional, for faster operation)
+  run "Compiling rbenv dynamic bash extension"
+  cd ~/.rbenv && src/configure && make -C src >/dev/null 2>&1 || warn "Failed to compile rbenv extension, but continuing..."
 
-      # Fix RVM permissions
-      run "Fixing RVM permissions"
-      rvm fix-permissions system 2>/dev/null || true
-      rvm fix-permissions user 2>/dev/null || true
-      ok "RVM permissions fixed"
+  # Install ruby-build plugin
+  run "Installing ruby-build plugin"
+
+  if [[ -d "$HOME/.rbenv/plugins/ruby-build" ]]; then
+    warn "ruby-build already exists, updating..."
+    cd "$HOME/.rbenv/plugins/ruby-build" && git pull
+  else
+    if git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build; then
+      ok "ruby-build installed successfully"
     else
-      error "RVM script not found after installation"
+      error "Failed to install ruby-build"
       return 1
     fi
+  fi
 
-    # Verify RVM is working
-    if command -v rvm >/dev/null 2>&1; then
-      ok "RVM installation verified"
+  # Verify rbenv is working
+  if command -v rbenv >/dev/null 2>&1; then
+    ok "rbenv installation verified"
 
-      # Install Ruby using RVM's default latest stable version
-      run "Installing Ruby (latest stable version)"
+    # Install Ruby using rbenv
+    run "Installing Ruby (latest stable version)"
 
-      # Install Ruby
-      local ruby_installed=false
-      if rvm install ruby; then
-        ruby_installed=true
-        ok "Ruby installed successfully"
-      else
-        error "Failed to install Ruby"
-        return 1
-      fi
+    # Check OpenSSL version to determine best Ruby version
+    local openssl_version=$(openssl version | awk '{print $2}' | cut -d. -f1)
+    local ruby_version=""
 
-      if [[ "$ruby_installed" == "true" ]]; then
-        # Set as default and use it
-        run "Setting Ruby as default"
+    if [[ "$openssl_version" == "3" ]]; then
+      # OpenSSL 3.x detected - install Ruby 3.1+ for compatibility
+      run "OpenSSL 3.x detected, installing Ruby 3.1+ for compatibility"
 
-        # Set Ruby as default - RVM automatically sets installed ruby as default
-        if rvm use ruby --default; then
-          ok "Ruby set as default"
-        else
-          warn "Failed to set Ruby as default, but continuing..."
+      # Try to install latest stable Ruby versions with OpenSSL 3.x support
+      # Ruby 3.3 has the best OpenSSL 3.x support
+      for version in "3.3.6" "3.3.5" "3.3.4" "3.2.6" "3.2.5" "3.1.6"; do
+        run "Trying to install Ruby $version..."
+        if rbenv install "$version" 2>/dev/null; then
+          ruby_version="$version"
+          ok "Ruby $version installed successfully with OpenSSL 3.x support"
+          break
         fi
+      done
 
-        # Reload RVM environment
-        source "$HOME/.rvm/scripts/rvm"
-        rvm use default >/dev/null 2>&1
-
-        # Verify installation
-        if command -v ruby >/dev/null 2>&1 && command -v gem >/dev/null 2>&1; then
-          local installed_version=$(ruby --version 2>/dev/null | cut -d' ' -f2)
-          ok "Ruby $installed_version ready"
-
-          # Update RubyGems to latest version
-          run "Updating RubyGems to latest version"
-          if gem update --system --no-document --quiet; then
-            ok "RubyGems updated successfully"
-          else
-            warn "RubyGems update failed, but continuing..."
-          fi
-        else
-          error "Ruby installation verification failed"
-          return 1
-        fi
-      else
-        error "Ruby installation failed completely"
+      if [[ -z "$ruby_version" ]]; then
+        error "Failed to install Ruby with OpenSSL 3.x compatibility"
         return 1
       fi
     else
-      error "RVM installation failed - command not available"
+      # OpenSSL 1.x - install latest stable Ruby
+      ruby_version="3.3.6"
+      run "Installing Ruby $ruby_version"
+
+      if rbenv install "$ruby_version" 2>/dev/null; then
+        ok "Ruby $ruby_version installed successfully"
+      else
+        error "Failed to install Ruby $ruby_version"
+        return 1
+      fi
+    fi
+
+    # Set as global default
+    run "Setting Ruby $ruby_version as global default"
+    if rbenv global "$ruby_version"; then
+      ok "Ruby $ruby_version set as default"
+    else
+      warn "Failed to set Ruby as default, but continuing..."
+    fi
+
+    # Rehash rbenv
+    rbenv rehash
+
+    # Verify installation
+    if command -v ruby >/dev/null 2>&1 && command -v gem >/dev/null 2>&1; then
+      local installed_version=$(ruby --version 2>/dev/null | cut -d' ' -f2)
+      ok "Ruby $installed_version ready"
+
+      # Update RubyGems to latest version
+      run "Updating RubyGems to latest version"
+      if gem update --system --no-document --quiet; then
+        ok "RubyGems updated successfully"
+        rbenv rehash
+      else
+        warn "RubyGems update failed, but continuing..."
+      fi
+    else
+      error "Ruby installation verification failed"
       return 1
     fi
   else
-    error "RVM installation failed"
+    error "rbenv installation failed - command not available"
     return 1
   fi
 
@@ -139,14 +139,15 @@ function gem_install() {
 
   run "Installing gem: $gem_name $gem_options"
 
-  # Ensure we're using RVM Ruby if available
-  if command -v rvm >/dev/null 2>&1; then
-    source "$HOME/.rvm/scripts/rvm"
-    rvm use default
+  # Ensure we're using rbenv Ruby if available
+  if command -v rbenv >/dev/null 2>&1; then
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    eval "$(rbenv init -)"
   fi
 
-  if gem install "$gem_name" $gem_options; then
+  if gem install "$gem_name" $gem_options --no-document; then
     ok "Successfully installed $gem_name"
+    rbenv rehash 2>/dev/null || true
     return 0
   else
     error "Failed to install gem: $gem_name"
@@ -155,19 +156,11 @@ function gem_install() {
 }
 
 function gem_installer_start() {
-  # Ensure RVM and Ruby are available and properly loaded
-  if command -v rvm >/dev/null 2>&1; then
-    # Source RVM to ensure we're using the right Ruby/gem
-    source "$HOME/.rvm/scripts/rvm" >/dev/null 2>&1
-
-    # Add RVM to PATH
-    export PATH="$HOME/.rvm/bin:$PATH"
-
-    # Use the current default Ruby
-    rvm use default >/dev/null 2>&1
-
-    # Force reload the environment
-    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+  # Ensure rbenv and Ruby are available and properly loaded
+  if command -v rbenv >/dev/null 2>&1; then
+    # Initialize rbenv
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    eval "$(rbenv init -)"
   fi
 
   # Check if both ruby and gem are available
@@ -200,7 +193,7 @@ function gem_installer_start() {
 
   # Skip gem installation if no gems configured
   if [[ ${#gems_to_install[@]} -eq 0 ]]; then
-    ok "No gems configured in config.toml - skipping gem installation"
+    ok "No gems configured in config.yaml - skipping gem installation"
     return 0
   fi
 
