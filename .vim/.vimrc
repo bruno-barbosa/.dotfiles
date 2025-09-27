@@ -113,5 +113,52 @@ set hlsearch        " Highlight searches by default
 set ignorecase      " Ignore case when searching...
 set smartcase       " ...unless we type a capital
 
+" ================ Plugin Management ========================
+
+" vim-plug plugin manager
+call plug#begin('~/.vim/plugged')
+
+" Essential plugins
+Plug 'preservim/nerdtree'              " File explorer
+Plug 'vim-airline/vim-airline'         " Status line
+Plug 'vim-airline/vim-airline-themes'  " Airline themes
+Plug 'junegunn/fzf.vim'               " Fuzzy finder
+Plug 'tpope/vim-fugitive'             " Git integration
+Plug 'airblade/vim-gitgutter'         " Git diff in gutter
+Plug 'tpope/vim-commentary'           " Easy commenting
+Plug 'tpope/vim-surround'             " Surround text objects
+Plug 'dracula/vim', { 'as': 'dracula' } " Dracula theme
+
+" Language support
+Plug 'sheerun/vim-polyglot'           " Language pack
+Plug 'dense-analysis/ale'             " Linting and fixing
+
+call plug#end()
+
+" ================ Plugin Settings ========================
+
+" NERDTree settings
+map <C-n> :NERDTreeToggle<CR>
+let NERDTreeShowHidden=1
+
+" Airline settings
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
+let g:airline_theme = 'dracula'
+
+" FZF settings
+map <C-p> :Files<CR>
+map <C-b> :Buffers<CR>
+
+" Use Dracula colorscheme if available
+try
+  colorscheme dracula
+catch
+  colorscheme dracula_pro
+endtry
+
 " ================ Custom Settings ========================
-so ~/.yadr/vim/settings.vim
+" Load additional settings if available
+if filereadable(expand("~/.dotfiles/.vim/settings.vim"))
+  so ~/.dotfiles/.vim/settings.vim
+endif
