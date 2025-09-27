@@ -6,64 +6,117 @@
 
 # verifies brew installation
 function check_brew() {
-  run "Checking homebrew installation"
-  brew_bin=$(which brew) 2>&1 >/dev/null
-  if [[ $? != 0 ]]; then
-    action "Installing homebrew"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    if [[ $? != 0 ]]; then
-      error "Unable to install homebrew, aborting installation!"
-      exit 2
+  run "Checking for existing homebrew installation..."
+
+  # Check if brew command exists - this can be slow on first run
+  local brew_bin
+  if brew_bin=$(command -v brew 2>/dev/null); then
+    ok "Homebrew found at: $brew_bin"
+
+    run "Updating homebrew repositories (this may take a moment)..."
+    if brew update; then
+      ok "Homebrew repositories updated successfully"
+    else
+      warn "Homebrew update encountered issues, but continuing..."
+    fi
+
+    # Check for outdated packages
+    run "Checking for outdated packages..."
+    local outdated_count
+    outdated_count=$(brew outdated --quiet | wc -l | xargs)
+
+    if [[ "$outdated_count" -gt 0 ]]; then
+      bot "Found $outdated_count outdated package(s). Would you like to upgrade them?"
+      read -r -p "run brew upgrade? [y|N] " response
+      if [[ $response =~ ^(y|yes|Y) ]]; then
+        action "Upgrading $outdated_count outdated package(s) (this may take several minutes)..."
+        if brew upgrade; then
+          ok "Package upgrade completed successfully"
+        else
+          warn "Some packages failed to upgrade, but continuing..."
+        fi
+      else
+        ok "Skipped brew packages upgrade"
+      fi
+    else
+      ok "All packages are up to date"
     fi
   else
-    run "Updating homebrew"
-    brew update
-    bot "Before installing brew packages, would you like to upgrade outdated packages?"
-    read -r -p "run brew upgrade? [y|N]" response
-    if [[ $response =~ ^(y|yes|Y) ]]; then
-      action "Upgrading brew packages"
-      brew upgrade
+    action "Homebrew not found - installing now..."
+    run "Downloading Homebrew installer (this may take a moment)..."
+
+    # Install Homebrew with progress indication
+    if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+      ok "Homebrew installation completed"
+
+      # Set up environment for different architectures
+      run "Setting up Homebrew environment..."
+      if [[ -f "/opt/homebrew/bin/brew" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        ok "Homebrew environment configured (Apple Silicon)"
+      elif [[ -f "/usr/local/bin/brew" ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+        ok "Homebrew environment configured (Intel)"
+      else
+        error "Homebrew installation completed but brew command not found"
+        return 1
+      fi
+
+      # Verify installation
+      if command -v brew >/dev/null 2>&1; then
+        local brew_version=$(brew --version | head -1)
+        ok "Homebrew ready: $brew_version"
+      else
+        error "Homebrew installation failed - command not available"
+        return 1
+      fi
     else
-      ok "Skipped brew packages upgrade"
+      error "Homebrew installation failed"
+      return 1
     fi
   fi
 }
 
 # brew installer helper function
 function brew_install() {
-  run "Checking if $1 is installed"
-  brew list $1 >/dev/null 2>&1 | true
-  if [[ ${PIPESTATUS[0]} != 0 ]]; then
-    action "Installing $1 with homebrew"
-    brew install $1 $2
-    if [[ $? != 0 ]]; then
-      error "Failed to install $1! Aborting..."
-    fi
+  # Check if already installed (quietly)
+  if brew list $1 >/dev/null 2>&1; then
+    ok "    ✓ $1 already installed"
+    return 0
+  fi
+
+  # Install the package
+  if brew install $1 $2 >/dev/null 2>&1; then
+    ok "    ✓ $1 installed successfully"
+    return 0
   else
-    ok "$1 already installed"
+    error "    ✗ Failed to install $1"
+    return 1
   fi
 }
 
 # brew cask installer helper (updated for modern Homebrew)
 function brew_cask_install() {
-  run "Checking if cask $1 is installed"
-  brew list --cask $1 >/dev/null 2>&1 | true
-  if [[ ${PIPESTATUS[0]} != 0 ]]; then
-    action "Installing cask $1 with homebrew"
-    brew install --cask $1 $2
-    if [[ $? != 0 ]]; then
-      error "Failed to install $1! Aborting..."
-    fi
+  # Check if already installed (quietly)
+  if brew list --cask $1 >/dev/null 2>&1; then
+    ok "    ✓ $1 already installed"
+    return 0
+  fi
+
+  # Install the cask
+  if brew install --cask $1 $2 >/dev/null 2>&1; then
+    ok "    ✓ $1 installed successfully"
+    return 0
   else
-    ok "Cask $1 already installed"
+    error "    ✗ Failed to install $1"
+    return 1
   fi
 }
 
 # Install packages from configuration
 function brew_installer_start() {
   # Load configuration if not already loaded
-  if [[ -z "${CONFIG_SETUP_PACKAGES_OSX[packages]:-}" ]]; then
+  if [[ -z "${CONFIG_SETUP_PACKAGES_OSX:-}" ]]; then
     load_configs
   fi
 
@@ -76,25 +129,62 @@ function brew_installer_start() {
     return 0
   fi
 
-  # Convert string to array
-  read -ra packages <<< "$packages_string"
+  # Convert string to array - bash 3.2+ compatible
+  local packages=()
+  if [[ -n "$packages_string" ]]; then
+    # Use bash 3.2+ compatible array conversion
+    IFS=' ' read -ra packages <<< "$packages_string"
+  fi
 
-  run "Installing $(echo ${#packages[@]}) packages from configuration using Homebrew"
+  local total_packages=${#packages[@]}
+  run "Installing $total_packages packages from configuration using Homebrew"
 
   # Tap homebrew/cask for GUI applications
-  brew tap homebrew/cask 2>/dev/null || true
+  run "Setting up Homebrew cask tap for GUI applications..."
+  if brew tap homebrew/cask 2>/dev/null; then
+    ok "Homebrew cask tap ready"
+  else
+    warn "Homebrew cask tap failed, but continuing..."
+  fi
 
-  # Install packages
+  # Install packages with progress tracking
+  local current=0
+  local failed_packages=()
+
   for package in "${packages[@]}"; do
     if [ -n "$package" ]; then
+      ((current++))
+      run "[$current/$total_packages] Processing package: $package"
+
       # Check if it's a cask package (GUI applications)
+      run "  → Determining package type for $package..."
       if brew info --cask "$package" >/dev/null 2>&1; then
-        brew_cask_install "$package"
+        run "  → Installing $package as cask (GUI application)..."
+        if ! brew_cask_install "$package"; then
+          failed_packages+=("$package (cask)")
+        fi
       else
-        brew_install "$package"
+        run "  → Installing $package as formula (CLI tool)..."
+        if ! brew_install "$package"; then
+          failed_packages+=("$package (formula)")
+        fi
       fi
     fi
   done
+
+  # Report installation results
+  local failed_count=${#failed_packages[@]}
+  local success_count=$((total_packages - failed_count))
+
+  if [[ $failed_count -eq 0 ]]; then
+    ok "All $total_packages packages installed successfully"
+  else
+    warn "$failed_count package(s) failed to install:"
+    for failed_pkg in "${failed_packages[@]}"; do
+      warn "  → $failed_pkg"
+    done
+    warn "Successfully installed $success_count/$total_packages packages"
+  fi
 
   ok "Finished installing packages from configuration"
 }

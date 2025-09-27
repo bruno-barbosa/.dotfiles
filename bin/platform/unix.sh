@@ -52,7 +52,7 @@ function unix_installer_start() {
   detect_linux_distro
 
   # Load configuration if not already loaded
-  if [[ -z "${CONFIG_SETUP_PACKAGES_DEBIAN[packages]:-}" ]]; then
+  if [[ -z "${CONFIG_SETUP_PACKAGES_DEBIAN:-}" ]]; then
     load_configs
   fi
 
@@ -65,8 +65,12 @@ function unix_installer_start() {
     return 0
   fi
 
-  # Convert string to array
-  read -ra packages <<< "$packages_string"
+  # Convert string to array - bash 3.2+ compatible
+  local packages=()
+  if [[ -n "$packages_string" ]]; then
+    # Use bash 3.2+ compatible array conversion
+    IFS=' ' read -ra packages <<< "$packages_string"
+  fi
 
   run "Installing $(echo ${#packages[@]}) packages from configuration"
 

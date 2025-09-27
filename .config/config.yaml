@@ -1,0 +1,130 @@
+setup:
+  packages:
+    shared:
+      # Core development tools
+      - git
+      - git-extras
+      - curl
+      - wget
+      - jq
+      - tree
+      - htop
+
+      # Shell and terminal
+      - zsh
+      - tmux
+      - fzf
+
+    debian:
+      # Essential development packages
+      - build-essential
+      - vim
+      - nano
+
+      # Shell and terminal tools
+      - ripgrep
+      - fd-find
+
+      # System utilities
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - software-properties-common
+      - unzip
+      - zip
+      - xz-utils
+
+      # Development libraries (for building from source)
+      - python3-dev
+      - libbz2-dev
+      - libffi-dev
+      - liblzma-dev
+      - libncurses5-dev
+      - libncursesw5-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - libssl-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - tk-dev
+      - zlib1g-dev
+
+      # Additional development tools
+      - make
+      - cmake
+      - pkg-config
+      - autoconf
+      - automake
+      - libtool
+
+      # Network tools
+      - net-tools
+      - dnsutils
+      - telnet
+      - openssh-client
+      - rsync
+
+      # Media and file handling
+      - ffmpeg
+      - imagemagick
+      - pandoc
+
+      # Text processing
+      - awk
+      - sed
+      - grep
+      - less
+
+    osx:
+      # Development utilities
+      - gh
+      - docker
+      - docker-compose
+      - kubernetes-cli
+
+      # Text editors and IDEs (GUI apps - will be installed as casks)
+      - visual-studio-code
+
+      # Browsers (GUI apps - will be installed as casks)
+      - google-chrome
+
+      # Productivity apps (GUI apps - will be installed as casks)
+      - raycast
+      - iterm2
+
+      # Media and graphics (GUI apps - will be installed as casks)
+      - vlc
+      - imageoptim
+
+      # System utilities (GUI apps - will be installed as casks)
+      - appcleaner
+      - the-unarchiver
+
+    gems:
+      - bundler
+      - rake
+      - rubocop
+      - pry
+      - rspec
+
+    pip:
+      - pip
+      - setuptools
+      - wheel
+      - virtualenv
+      - requests
+      - black
+      - flake8
+      - pytest
+      - jupyter
+      - numpy
+      - pandas
+
+    node:
+      - npm
+      - yarn
+      - typescript
+      - eslint
+      - prettier
+      - nodemon

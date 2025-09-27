@@ -91,9 +91,9 @@ function node_installer_start() {
   local packages_list=$(get_node_packages)
   local packages_to_install=()
 
-  # Convert space-separated string to array
+  # Convert space-separated string to array - bash 3.2+ compatible
   if [[ -n "$packages_list" ]]; then
-    read -ra packages_to_install <<< "$packages_list"
+    IFS=' ' read -ra packages_to_install <<< "$packages_list"
   fi
 
   # Skip Node.js package installation if no packages configured

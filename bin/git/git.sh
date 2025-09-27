@@ -26,23 +26,6 @@ function git_config() {
         needs_config=true
       else
         ok "Using existing git configuration"
-
-        # Still ensure .gitignore is linked even if not reconfiguring
-        run "ensuring global gitignore is linked"
-        if [ ! -L "$HOME/.gitignore_global" ] || [ ! -e "$HOME/.gitignore_global" ]; then
-          if [ -L "$HOME/.gitignore_global" ]; then
-            rm "$HOME/.gitignore_global"
-          elif [ -f "$HOME/.gitignore_global" ]; then
-            mv "$HOME/.gitignore_global" "$HOME/.gitignore_global.backup"
-            echo "Existing .gitignore_global backed up to .gitignore_global.backup"
-          fi
-          ln -s ~/.dotfiles/.config/.gitignore "$HOME/.gitignore_global"
-          ok "Global gitignore linked to ~/.gitignore_global"
-        else
-          ok "Global gitignore already linked"
-        fi
-
-        return 0
       fi
     else
       needs_config=true
@@ -113,8 +96,9 @@ function git_config() {
 
     # test if gnu-sed or osx sed
 
-    sed -i "s/GITHUBFULLNAME/$firstname $lastname/" ./.config/.gitconfig > /dev/null 2>&1 | true
-    if [[ ${PIPESTATUS[0]} != 0 ]]; then
+    sed -i "s/GITHUBFULLNAME/$firstname $lastname/" ./.config/.gitconfig > /dev/null 2>&1
+    local sed_status=$?
+    if [[ $sed_status != 0 ]]; then
       echo
       run "looks like you are using OSX sed rather than gnu-sed, accommodating"
       sed -i '' "s/GITHUBFULLNAME/$firstname $lastname/" ./.config/.gitconfig;
@@ -126,7 +110,7 @@ function git_config() {
       sed -i 's/GITHUBEMAIL/'$email'/' ./.config/.gitconfig;
       sed -i 's/GITHUBUSER/'$githubuser'/' ./.config/.gitconfig;
     fi
-    run "copying gitconfig to home directory"
+    run "linking gitconfig to home directory"
     # Remove existing .gitconfig if it exists
     if [ -L "$HOME/.gitconfig" ]; then
       rm "$HOME/.gitconfig"
@@ -135,17 +119,21 @@ function git_config() {
       echo "Existing .gitconfig backed up to .gitconfig.backup"
     fi
     ln -s ~/.dotfiles/.config/.gitconfig "$HOME/.gitconfig"
-
-    run "linking global gitignore file"
-    # Link the global gitignore file for compatibility
-    if [ -L "$HOME/.gitignore_global" ]; then
-      rm "$HOME/.gitignore_global"
-    elif [ -f "$HOME/.gitignore_global" ]; then
-      mv "$HOME/.gitignore_global" "$HOME/.gitignore_global.backup"
-      echo "Existing .gitignore_global backed up to .gitignore_global.backup"
-    fi
-    ln -s ~/.dotfiles/.config/.gitignore "$HOME/.gitignore_global"
-    ok "Global gitignore linked to ~/.gitignore_global"
+    ok "Global gitconfig linked to ~/.gitconfig"
   fi
 
+  # Always ensure .gitconfig is linked to home directory (even if not reconfiguring)
+  run "ensuring gitconfig is linked to home directory"
+  if [ ! -L "$HOME/.gitconfig" ] || [ "$(readlink "$HOME/.gitconfig")" != "$HOME/.dotfiles/.config/.gitconfig" ]; then
+    if [ -L "$HOME/.gitconfig" ]; then
+      rm "$HOME/.gitconfig"
+    elif [ -f "$HOME/.gitconfig" ]; then
+      mv "$HOME/.gitconfig" "$HOME/.gitconfig.backup.$(date +%s)"
+      run "Existing .gitconfig backed up"
+    fi
+    ln -s ~/.dotfiles/.config/.gitconfig "$HOME/.gitconfig"
+    ok "gitconfig linked to home directory"
+  else
+    ok "gitconfig already properly linked"
+  fi
 }

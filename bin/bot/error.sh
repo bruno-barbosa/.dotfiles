@@ -7,8 +7,13 @@
 # Initialize error log file (will be set up after OS detection)
 ERROR_LOG="${HOME}/.dotfiles/errors.log"
 
-# Function to initialize error log
+# Function to initialize error log (only called when first error occurs)
 function init_error_log() {
+  # Remove existing log if it exists to start fresh
+  if [[ -f "$ERROR_LOG" ]]; then
+    rm -f "$ERROR_LOG"
+  fi
+
   # Ensure the directory exists
   local error_dir="$(dirname "$ERROR_LOG")"
   mkdir -p "$error_dir" 2>/dev/null || true
@@ -94,6 +99,12 @@ function cleanup_error_log() {
 
 # Function to display error summary
 function show_error_summary() {
+  # Check if error log exists - if not, no errors occurred
+  if [[ ! -f "$ERROR_LOG" ]]; then
+    ok "No errors occurred during installation."
+    return 0
+  fi
+
   local error_count
   error_count=$(get_error_count | tr -d '\n\r ' | head -n1)
 

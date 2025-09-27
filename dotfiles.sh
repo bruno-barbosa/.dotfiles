@@ -90,14 +90,20 @@ else
   bot "Running in INSTALL mode - will perform fresh installation"
 fi
 
-# Initialize error logging
-init_error_log
+# Clean up any existing error log from previous runs
+if [[ -f "${HOME}/.dotfiles/errors.log" ]]; then
+  run "Removing previous errors log"
+  rm -f "${HOME}/.dotfiles/errors.log"
+  ok "Previous error log removed"
+fi
+
+# Error logging will be initialized only when first error occurs
 
 ###############################################################################
 # INSTALLATION PLAN AND OVERVIEW
 ###############################################################################
 
-bot "Hey there! I'm Eros, setting up your development environment for $OS."
+bot "Hey there! I am setting up your development environment for $OS."
 
 bot "Installation Plan:"
 todo_start "Set up package manager and install packages"
@@ -134,7 +140,8 @@ if [[ "$IS_MACOS" == "true" ]]; then
 
     bot "Do you want me to setup this machine to allow you to run sudo without a password?"
     bot "This is a macOS-specific configuration."
-    read -r -p "Make sudo passwordless on macOS? [y|N] " response
+    printf "Make sudo passwordless on macOS? [y|N] "
+    read -r response
 
     if [[ $response =~ (yes|y|Y) ]]; then
       # macOS uses different sed syntax
@@ -157,7 +164,8 @@ elif [[ "$IS_LINUX" == "true" ]]; then
 
     bot "Would you like to setup passwordless sudo for this user?"
     bot "This will allow you to run sudo commands without entering your password."
-    read -r -p "Setup passwordless sudo? [y|N] " sudo_response
+    printf "Setup passwordless sudo? [y|N] "
+    read -r sudo_response
 
     if [[ $sudo_response =~ ^(y|yes|Y) ]]; then
       if setup_passwordless_sudo; then
@@ -181,10 +189,16 @@ todo_progress "Set up package manager and install packages"
 
 if [[ "$IS_MACOS" == "true" ]]; then
   run "Checking Homebrew installation"
-  local error_output
+  error_output=""
   if error_output=$(check_brew 2>&1); then
-    if ! brew_installer_start; then
-      warn "Some Homebrew packages failed to install, but continuing..."
+    bot "Would you like to install packages from your configuration?"
+    read -r -p "Install Homebrew packages? [Y|n] " install_response
+    if [[ ! $install_response =~ ^(n|no|N) ]]; then
+      if ! brew_installer_start; then
+        warn "Some Homebrew packages failed to install, but continuing..."
+      fi
+    else
+      ok "Skipped Homebrew package installation"
     fi
   else
     error "Failed to setup Homebrew"
@@ -199,14 +213,26 @@ if [[ "$IS_MACOS" == "true" ]]; then
     fi
   fi
 
-  run "Cleaning up Homebrew cache"
-  safe_run "brew cleanup --force" "Homebrew cleanup" || true
-  rm -rf /Library/Caches/Homebrew/* 2>/dev/null || true
+  run "Cleaning up Homebrew cache and locks"
+  # Clear any stale locks first
+  safe_run "rm -rf /usr/local/var/homebrew/locks/*" "Clear Homebrew locks (Intel)" || true
+  safe_run "rm -rf /opt/homebrew/var/homebrew/locks/*" "Clear Homebrew locks (Apple Silicon)" || true
+  # Now run cleanup
+  safe_run "brew cleanup --prune=all" "Homebrew cleanup" || true
+  # Clean up cache directories
+  safe_run "rm -rf /Library/Caches/Homebrew/*" "Clear system Homebrew cache" || true
+  safe_run "rm -rf ~/Library/Caches/Homebrew/*" "Clear user Homebrew cache" || true
 
 elif [[ "$IS_LINUX" == "true" ]]; then
-  run "Installing essential Linux packages"
-  if ! unix_installer_start; then
-    warn "Some Linux packages failed to install, but continuing..."
+  bot "Would you like to install packages from your configuration?"
+  read -r -p "Install Linux packages? [Y|n] " install_response
+  if [[ ! $install_response =~ ^(n|no|N) ]]; then
+    run "Installing essential Linux packages"
+    if ! unix_installer_start; then
+      warn "Some Linux packages failed to install, but continuing..."
+    fi
+  else
+    ok "Skipped Linux package installation"
   fi
 fi
 
@@ -301,7 +327,8 @@ if [[ "$IS_MACOS" == "true" ]]; then
 
   bot "Would you like to apply macOS system defaults?"
   bot "This will configure Dock, Finder, Safari, keyboard settings, and other macOS preferences for development."
-  read -r -p "Apply macOS system defaults? [y|N] " response
+  printf "Apply macOS system defaults? [y|N] "
+  read -r response
 
   if [[ $response =~ ^(y|yes|Y) ]]; then
     if apply_macos_system_defaults; then
@@ -359,7 +386,8 @@ else
   if command -v vim >/dev/null 2>&1; then
     bot "Would you like to update vim-plug and all vim plugins?"
     bot "This will update vim-plug itself and all installed plugins to their latest versions."
-    read -r -p "Update vim plugins? [y|N] " vim_update_response
+    printf "Update vim plugins? [y|N] "
+    read -r vim_update_response
 
     if [[ $vim_update_response =~ ^(y|yes|Y) ]]; then
       run "Updating vim-plug"
@@ -433,7 +461,8 @@ todo_progress "Install development version managers (Volta, Ruby, pyenv)"
 # Ruby Version Manager (RVM)
 bot "Would you like to install RVM (Ruby Version Manager)?"
 bot "RVM allows you to easily install and manage multiple Ruby versions."
-read -r -p "Install RVM and Ruby? [y|N] " ruby_response
+printf "Install RVM and Ruby? [y|N] "
+read -r ruby_response
 
 if [[ $ruby_response =~ ^(y|yes|Y) ]]; then
   run "Setting up Ruby version manager (rvm)"
@@ -461,7 +490,8 @@ fi
 # Node.js Version Manager (Volta)
 bot "Would you like to install Volta (Node.js Toolchain Manager)?"
 bot "Volta allows you to easily install and manage Node.js, npm, and yarn versions."
-read -r -p "Install Volta and Node.js? [y|N] " node_response
+printf "Install Volta and Node.js? [y|N] "
+read -r node_response
 
 if [[ $node_response =~ ^(y|yes|Y) ]]; then
   run "Setting up Volta (Node.js toolchain manager)"
@@ -482,7 +512,8 @@ fi
 # Python Version Manager (pyenv)
 bot "Would you like to install pyenv (Python Version Manager)?"
 bot "pyenv allows you to easily install and manage multiple Python versions."
-read -r -p "Install pyenv and Python packages? [y|N] " python_response
+printf "Install pyenv and Python packages? [y|N] "
+read -r python_response
 
 if [[ $python_response =~ ^(y|yes|Y) ]]; then
   run "Setting up Python version manager (pyenv)"
@@ -504,13 +535,6 @@ else
 fi
 
 todo_complete "Install development version managers (Volta, Ruby, pyenv)"
-
-# R configuration (macOS only)
-if [[ "$IS_MACOS" == "true" ]]; then
-  action "Setting up R and enabling rJava support"
-  R CMD javareconf JAVA_CPPFLAGS=-I/System/Library/Frameworks/JavaVM.framework/Headers 2>/dev/null || true
-  ok "R configuration completed"
-fi
 
 ###############################################################################
 # COMPLETION AND SUMMARY

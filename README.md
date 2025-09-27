@@ -8,7 +8,7 @@ Modern, comprehensive dotfiles setup for macOS and Linux development environment
 
 - **Cross-Platform Support**: Works on macOS (Homebrew) and Linux (apt)
 - **Interactive Installation**: User prompts for selective component installation
-- **Configuration Management**: TOML-based package configuration
+- **Configuration Management**: YAML-based package configuration
 - **Error Handling**: Robust error logging and non-blocking failures
 - **Update Mode**: Refresh existing configurations and update packages
 
@@ -49,10 +49,10 @@ Modern, comprehensive dotfiles setup for macOS and Linux development environment
 ### 📦 **Package Management**
 
 - **Automated Installation**: Platform-specific package managers
-- **Configurable Packages**: Defined in `config.toml` with TOML parsing
+- **Configurable Packages**: Defined in `config.yaml` with YAML parsing
 - **Language Support**: Development libraries and tools
 - **GUI Applications**: macOS cask support for applications
-- **Robust Parsing**: Uses `tomlq` with fallback to manual parsing
+- **Robust Parsing**: Uses `yq` with automatic installation if not available
 
 ## 🚀 Quick Start
 
@@ -76,6 +76,22 @@ cd ~/.dotfiles
 ./dotfiles.sh --update
 ```
 
+## 📋 Requirements
+
+### System Requirements
+
+- **macOS**: macOS 10.15+ (Homebrew will be installed automatically)
+- **Linux**: Ubuntu/Debian-based distributions with `apt`
+- **Internet**: For downloading packages and plugins
+
+### Automatic Shell Detection
+
+The installer intelligently handles shell compatibility:
+
+1. **Preferred**: Runs with Zsh if available (better associative array support)
+2. **Fallback**: Uses Bash with automatic version upgrade if needed
+3. **Error Handling**: Clear error messages if neither shell meets requirements
+
 ## 🎯 Installation Options
 
 The installer provides interactive prompts for each component:
@@ -91,23 +107,40 @@ The installer provides interactive prompts for each component:
 
 ### Package Management
 
-Edit `.config/config.toml` to customize packages:
+Edit `.config/config.yaml` to customize packages:
 
-```toml
-[setup.packages]
-shared = []  # Cross-platform packages
+```yaml
+setup:
+  packages:
+    shared: # Cross-platform packages
+      - curl
+      - git
+      - vim
+      - tmux
 
-debian = [
-  "curl", "git", "vim", "tmux"
-]
+    debian:
+      - build-essential
+      - python3-dev
 
-osx = [
-  "git", "node", "python@3.11"
-]
+    osx:
+      - gh
+      - docker
+      - visual-studio-code
 
-gems = ["bundler", "rake", "rubocop"]
-pip = ["pip", "black", "pytest"]
-node = ["typescript", "eslint", "prettier"]
+    gems:
+      - bundler
+      - rake
+      - rubocop
+
+    pip:
+      - pip
+      - black
+      - pytest
+
+    node:
+      - typescript
+      - eslint
+      - prettier
 ```
 
 ### Shell Customization
@@ -146,7 +179,7 @@ The dotfiles support selective updates:
 │   ├── python/           # Python/pyenv setup
 │   └── platform/         # Platform-specific (macOS/Linux)
 ├── .config/
-│   ├── config.toml       # Package configuration (TOML format)
+│   ├── config.yaml       # Package configuration (YAML format)
 │   ├── .gitconfig        # Git settings template
 │   ├── .gitignore        # Global gitignore rules
 │   └── .tmux.conf        # Tmux configuration
@@ -166,7 +199,7 @@ The dotfiles support selective updates:
 
 ### Adding New Packages
 
-1. Edit `.config/config.toml`
+1. Edit `.config/config.yaml`
 2. Add packages to appropriate platform sections
 3. Run `./dotfiles.sh --update`
 
@@ -178,13 +211,6 @@ Plug 'your-username/your-plugin'
 ```
 
 Then run `:PlugInstall` in vim or use the installer's update option.
-
-## 📋 Requirements
-
-- **macOS**: macOS 10.15+ (Homebrew will be installed automatically)
-- **Linux**: Ubuntu/Debian-based distributions with `apt`
-- **Shell**: Bash 4.0+ (installer), Zsh (target shell)
-- **Internet**: For downloading packages and plugins
 
 ## 🤝 Contributing
 
