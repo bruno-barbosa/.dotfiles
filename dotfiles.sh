@@ -189,8 +189,7 @@ todo_progress "Set up package manager and install packages"
 
 if [[ "$IS_MACOS" == "true" ]]; then
   run "Checking Homebrew installation"
-  error_output=""
-  if error_output=$(check_brew 2>&1); then
+  if check_brew; then
     bot "Would you like to install packages from your configuration?"
     read -r -p "Install Homebrew packages? [Y|n] " install_response
     if [[ ! $install_response =~ ^(n|no|N) ]]; then
@@ -202,7 +201,6 @@ if [[ "$IS_MACOS" == "true" ]]; then
     fi
   else
     error "Failed to setup Homebrew"
-    log_error "Homebrew setup failed" "$error_output"
     exit 1
   fi
 

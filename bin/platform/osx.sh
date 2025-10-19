@@ -13,6 +13,14 @@ function check_brew() {
   if brew_bin=$(command -v brew 2>/dev/null); then
     ok "Homebrew found at: $brew_bin"
 
+    # Clean up any stale lock files
+    local lock_dir="/opt/homebrew/var/homebrew/locks"
+    if [[ -d "$lock_dir" && "$(ls -A "$lock_dir" 2>/dev/null)" ]]; then
+      run "Removing stale Homebrew lock files..."
+      rm -rf "$lock_dir"/* 2>/dev/null || true
+      ok "Homebrew locks cleaned"
+    fi
+
     run "Updating homebrew repositories (this may take a moment)..."
     if brew update; then
       ok "Homebrew repositories updated successfully"

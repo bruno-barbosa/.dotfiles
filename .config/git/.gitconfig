@@ -8,7 +8,7 @@
   editor = vim
   autocrlf = false
   excludesfile = ~/.dotfiles/.config/git/.gitignore
-	hooksPath = /home/bruno/.dotfiles/.config/git/hooks
+  hooksPath = ~/.dotfiles/.config/git/hooks
 
 [pull]
   rebase = true
