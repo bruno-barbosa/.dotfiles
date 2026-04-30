@@ -92,6 +92,8 @@ setup:
       - docker
       - docker-compose
       - kubernetes-cli
+      - rustup-init
+      - awscli
 
       # Text editors and IDEs (GUI apps - will be installed as casks)
       - visual-studio-code
