@@ -44,6 +44,8 @@ if [[ "$IS_MACOS" == "true" ]]; then
   # macOS-specific paths
   add_to_path "/opt/homebrew/bin"
   add_to_path "/usr/local/opt"
+  # rustup is keg-only on Homebrew; expose cargo/rustc proxies
+  add_to_path "/opt/homebrew/opt/rustup/bin"
 elif [[ "$IS_LINUX" == "true" ]]; then
   # Linux-specific paths
   add_to_path "/snap/bin"
