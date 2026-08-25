@@ -36,7 +36,7 @@ case "$1" in
     echo "  - Cross-platform support (macOS/Linux)"
     echo "  - Package manager setup (Homebrew/apt)"
     echo "  - Version managers (Volta, Ruby, pyenv)"
-    echo "  - Zsh configuration with oh-my-zsh"
+    echo "  - Zsh configuration with oh-my-zsh + starship prompt"
     echo "  - Tmux configuration"
     echo "  - Git configuration"
     echo ""
@@ -107,7 +107,7 @@ bot "Hey there! I am setting up your development environment for $OS."
 
 bot "Installation Plan:"
 todo_start "Set up package manager and install packages"
-todo_start "Configure shell environment (zsh + oh-my-zsh + powerlevel10k)"
+todo_start "Configure shell environment (zsh + oh-my-zsh + starship)"
 if [[ "$IS_MACOS" == "true" ]]; then
   todo_start "Apply macOS system defaults (optional)"
 fi
@@ -263,25 +263,33 @@ else
   ok "oh-my-zsh already installed"
 fi
 
-# Install powerlevel10k theme
-if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
-  run "Installing powerlevel10k theme"
+# Install starship prompt
+# Replaces powerlevel10k: starship runs on macOS, Linux and Windows from a
+# single .config/starship/starship.toml, so the prompt is identical on every
+# machine. p10k was zsh-only and its config was never version controlled.
+if ! command -v starship >/dev/null 2>&1; then
+  run "Installing starship prompt"
   error_output=""
-  if error_output=$(git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" 2>&1); then
-    ok "powerlevel10k theme installed successfully"
-
-    # Inform user about p10k configuration
-    bot "Powerlevel10k has been installed!"
-    bot "After installation completes, restart your terminal or run 'source ~/.zshrc'"
-    bot "Then run 'p10k configure' to set up your prompt."
+  if error_output=$(curl -sS https://starship.rs/install.sh | sh -s -- --yes 2>&1); then
+    ok "starship installed successfully"
   else
-    warn "Failed to install powerlevel10k theme"
-    log_error "powerlevel10k theme installation failed" "$error_output"
+    warn "Failed to install starship"
+    log_error "starship installation failed" "$error_output"
   fi
 else
-  ok "powerlevel10k theme already installed"
+  ok "starship already installed"
 fi
-
+# Install Maple Mono NF (prompt glyphs)
+if [ -f "$HOME/.dotfiles/bin/platform/fonts.sh" ]; then
+  run "Installing Maple Mono NF font"
+  # shellcheck source=bin/platform/fonts.sh
+  source "$HOME/.dotfiles/bin/platform/fonts.sh"
+  if install_fonts; then
+    ok "Maple Mono NF ready"
+  else
+    warn "Font install failed - prompt glyphs will render as boxes"
+  fi
+fi
 # Install zsh plugins
 run "Installing zsh plugins"
 

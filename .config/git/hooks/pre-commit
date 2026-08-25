@@ -30,7 +30,7 @@ echo ""
 ###########################################
 echo "Checking for merge conflict markers..."
 # Exclude hook files from merge conflict check to avoid false positives
-if git diff --cached --name-only | grep -v '.config/git/hooks/' | xargs grep -l -E '<<<<<<< |=======$|>>>>>>> ' 2>/dev/null; then
+if git diff --cached --name-only | grep -v '.config/git/hooks/' | xargs grep -l -E '^<<<<<<< |^=======$|^>>>>>>> ' 2>/dev/null; then
   echo -e "${RED}✗ Found merge conflict markers in staged files${NC}"
   echo "  Please resolve conflicts before committing"
   CHECKS_FAILED=1

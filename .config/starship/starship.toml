@@ -1,0 +1,127 @@
+add_newline = true
+palette = 'catppuccin_mocha'
+
+format = '$os$directory$git_branch$git_status$nodejs$python$rust$golang$dotnet$java$ruby$php$lua$fill$cmd_duration$time$line_break$character'
+
+[fill]
+symbol = ' '
+
+[os]
+disabled = false
+style = 'mauve'
+format = '[$symbol]($style)  '
+
+[os.symbols]
+Windows = ''
+Ubuntu = ''
+Linux = ''
+Macos = ''
+
+[directory]
+style = 'bold blue'
+format = '[$path]($style) '
+truncation_length = 3
+truncation_symbol = '…/'
+
+[git_branch]
+symbol = ''
+style = 'green'
+format = '[$symbol $branch]($style) '
+
+[git_status]
+style = 'yellow'
+format = '[$all_status$ahead_behind]($style) '
+modified = '!${count}'
+untracked = '?${count}'
+staged = '+${count}'
+stashed = '*${count}'
+ahead = '⇡${count}'
+behind = '⇣${count}'
+
+[nodejs]
+symbol = ''
+style = 'green'
+format = '[$symbol( $version)]($style) '
+
+[python]
+symbol = ''
+style = 'yellow'
+format = '[$symbol( $version)]($style) '
+
+[rust]
+symbol = ''
+style = 'peach'
+format = '[$symbol( $version)]($style) '
+
+[golang]
+symbol = ''
+style = 'sky'
+format = '[$symbol( $version)]($style) '
+
+[dotnet]
+symbol = ''
+style = 'mauve'
+format = '[$symbol( $tfm)]($style) '
+
+[java]
+symbol = ''
+style = 'red'
+format = '[$symbol( $version)]($style) '
+
+[ruby]
+symbol = ''
+style = 'red'
+format = '[$symbol( $version)]($style) '
+
+[php]
+symbol = ''
+style = 'lavender'
+format = '[$symbol( $version)]($style) '
+
+[lua]
+symbol = ''
+style = 'blue'
+format = '[$symbol( $version)]($style) '
+
+[cmd_duration]
+min_time = 2000
+style = 'overlay1'
+format = '[$duration ]($style)'
+
+[time]
+disabled = false
+style = 'overlay0'
+time_format = '%H:%M'
+format = '[$time]($style)'
+
+[character]
+success_symbol = '[❯](bold mauve)'
+error_symbol = '[❯](bold red)'
+
+[palettes.catppuccin_mocha]
+rosewater = '#f5e0dc'
+flamingo = '#f2cdcd'
+pink = '#f5c2e7'
+mauve = '#cba6f7'
+red = '#f38ba8'
+maroon = '#eba0ac'
+peach = '#fab387'
+yellow = '#f9e2af'
+green = '#a6e3a1'
+teal = '#94e2d5'
+sky = '#89dceb'
+sapphire = '#74c7ec'
+blue = '#89b4fa'
+lavender = '#b4befe'
+text = '#cdd6f4'
+subtext1 = '#bac2de'
+subtext0 = '#a6adc8'
+overlay2 = '#9399b2'
+overlay1 = '#7f849c'
+overlay0 = '#6c7086'
+surface2 = '#585b70'
+surface1 = '#45475a'
+surface0 = '#313244'
+base = '#1e1e2e'
+mantle = '#181825'
+crust = '#11111b'

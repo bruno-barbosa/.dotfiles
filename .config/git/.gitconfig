@@ -110,5 +110,24 @@
   snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
   snapshots = !git stash list --grep snapshot
 
+[core]
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  features = catppuccin-mocha
+  navigate = true
+  line-numbers = true
+
+[merge]
+  conflictstyle = zdiff3
+
+[diff]
+  colorMoved = default
+
+[include]
+  path = ~/.dotfiles/.config/git/catppuccin-delta.gitconfig
 [include]
   path = ~/.dotfiles/.config/git/.gitconfig.user

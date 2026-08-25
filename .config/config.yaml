@@ -15,6 +15,13 @@ setup:
       - tmux
       - fzf
 
+      # Cross-platform prompt + modern CLI (all three OSes)
+      - starship
+      - zoxide
+      - eza
+      - bat
+      - git-delta
+
     debian:
       # Essential development packages
       - build-essential
@@ -79,6 +86,9 @@ setup:
     osx:
       # Development utilities
       - gh
+
+      # Nerd Font for the starship prompt glyphs
+      - font-maple-mono-nf
       - docker
       - docker-compose
       - kubernetes-cli
@@ -101,6 +111,22 @@ setup:
       - appcleaner
       - the-unarchiver
 
+    windows:
+      # installed via scoop (main bucket unless noted)
+      - git
+      - gh
+      - starship
+      - fzf
+      - zoxide
+      - eza
+      - bat
+      - delta
+      - ripgrep
+      - fd
+      - jq
+      - less
+      # nerd-fonts bucket
+      - MapleMono-NF
     gems:
       - bundler
       - rake

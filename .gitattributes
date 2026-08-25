@@ -1,0 +1,17 @@
+# Cross-platform line endings.
+# Windows checks this repo out with core.autocrlf=true, which would give shell
+# scripts CRLF and break their shebangs on Linux/macOS. Pin them to LF.
+* text=auto eol=lf
+
+# PowerShell is native to Windows; CRLF is conventional there.
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Never touch binaries.
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.ico binary

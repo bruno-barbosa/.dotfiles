@@ -1,16 +1,9 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 export ZSH="$HOME/.oh-my-zsh"
 
 source $HOME/.dotfiles/.zsh/.sources.zsh
 source $HOME/.dotfiles/.zsh/.path.zsh
 
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME=""   # prompt comes from starship -- see .tools.zsh at the end of this file
 ZSH_COLORIZE_TOOL="chroma"
 ZSH_COLORIZE_STYLE="colorful"
 
@@ -140,11 +133,7 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 
 source $ZSH/oh-my-zsh.sh
 
-# Ensure Powerlevel10k is properly loaded and p10k command is available
-if [[ -f "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
-  # Source the theme directly to ensure p10k command is available
-  source "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k/powerlevel10k.zsh-theme"
-fi
-
-# Load p10k configuration if it exists
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Modern CLI tools + starship prompt.
+# Sourced last, after oh-my-zsh, because oh-my-zsh sets its own prompt and
+# would otherwise clobber starship.
+source $HOME/.dotfiles/.zsh/.tools.zsh
