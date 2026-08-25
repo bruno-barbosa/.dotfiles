@@ -27,8 +27,25 @@ Add-ToPath (Join-Path $HOME 'go\bin')
 # ------------------------------------------------------------------- prompt
 # same starship.toml the zsh side uses -- one prompt on all three platforms
 $env:STARSHIP_CONFIG = Join-Path $env:DOTFILES '.config\starship\starship.toml'
-if (Get-Command starship -ErrorAction SilentlyContinue) {
-    Invoke-Expression (&starship init powershell)
+if ($starshipCmd = Get-Command starship -ErrorAction SilentlyContinue) {
+    # `starship init powershell` returns a 128-char bootstrap that launches
+    # starship a SECOND time with --print-full-init: two process spawns per
+    # shell start, ~460ms on Windows PowerShell 5.1. Ask for the full init
+    # once and cache it, keyed on the binary's timestamp so an upgrade
+    # regenerates automatically. Dot-sourcing the cache is ~90ms.
+    try {
+        $stamp     = (Get-Item $starshipCmd.Source).LastWriteTime.Ticks
+        $cacheDir  = Join-Path $HOME '.cache\pwsh'
+        $cacheFile = Join-Path $cacheDir "starship-init-$stamp.ps1"
+        if (-not (Test-Path $cacheFile)) {
+            if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory $cacheDir -Force | Out-Null }
+            (& $starshipCmd.Source init powershell --print-full-init) | Out-String |
+                Set-Content -Path $cacheFile -Encoding UTF8
+        }
+        . $cacheFile
+    } catch {
+        Invoke-Expression (&starship init powershell)
+    }
 }
 
 # --------------------------------------------------------------- PSReadLine
@@ -83,14 +100,54 @@ $env:FZF_DEFAULT_OPTS = @(
     '--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8'
 ) -join ' '
 
-if (Get-Module -ListAvailable PSFzf) {
-    Import-Module PSFzf -ErrorAction SilentlyContinue
-    try { Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r' -ErrorAction Stop } catch { }
+# Bound by hand rather than via Import-Module PSFzf: that module costs ~300ms
+# at every shell start, whereas these ScriptBlocks cost nothing until the key
+# is actually pressed.
+if ((Get-Command fzf -ErrorAction SilentlyContinue) -and (Get-Module PSReadLine)) {
+    try {
+        Set-PSReadLineKeyHandler -Key 'Ctrl+r' -BriefDescription 'FuzzyHistory' -ScriptBlock {
+            $histPath = (Get-PSReadLineOption).HistorySavePath
+            if (-not (Test-Path $histPath)) { return }
+            $lines = [System.IO.File]::ReadAllLines($histPath)
+            [array]::Reverse($lines)
+            $sel = $lines | Where-Object { $_.Trim() } | Select-Object -Unique |
+                   fzf --prompt 'history> '
+            if ($sel) {
+                [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+                [Microsoft.PowerShell.PSConsoleReadLine]::Insert($sel)
+            }
+        } -ErrorAction Stop
+
+        Set-PSReadLineKeyHandler -Key 'Ctrl+t' -BriefDescription 'FuzzyFile' -ScriptBlock {
+            if (Get-Command fd -ErrorAction SilentlyContinue) {
+                $sel = fd --type f --hidden --exclude .git | fzf --prompt 'file> '
+            } else {
+                $sel = Get-ChildItem -Recurse -File -ErrorAction SilentlyContinue |
+                       ForEach-Object { $_.FullName.Substring($PWD.Path.Length + 1) } |
+                       fzf --prompt 'file> '
+            }
+            if ($sel) { [Microsoft.PowerShell.PSConsoleReadLine]::Insert($sel) }
+        } -ErrorAction Stop
+    } catch { }
 }
 
 # ------------------------------------------------------------------ zoxide
-if (Get-Command zoxide -ErrorAction SilentlyContinue) {
-    Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
+if ($zoxideCmd = Get-Command zoxide -ErrorAction SilentlyContinue) {
+    # Cached for the same reason as starship: the init is static, so there is
+    # no need to spawn zoxide on every shell start.
+    try {
+        $stamp     = (Get-Item $zoxideCmd.Source).LastWriteTime.Ticks
+        $cacheDir  = Join-Path $HOME '.cache\pwsh'
+        $cacheFile = Join-Path $cacheDir "zoxide-init-$stamp.ps1"
+        if (-not (Test-Path $cacheFile)) {
+            if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory $cacheDir -Force | Out-Null }
+            (& $zoxideCmd.Source init powershell --cmd cd) | Out-String |
+                Set-Content -Path $cacheFile -Encoding UTF8
+        }
+        . $cacheFile
+    } catch {
+        Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
+    }
 }
 
 # --------------------------------------------------------------------- eza
