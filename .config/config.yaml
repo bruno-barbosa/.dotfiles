@@ -78,7 +78,7 @@ setup:
       - pandoc
 
       # Text processing
-      - awk
+      - gawk   # "awk" is a virtual package in Debian; gawk is the real one
       - sed
       - grep
       - less

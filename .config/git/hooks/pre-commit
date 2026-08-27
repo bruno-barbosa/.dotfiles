@@ -72,11 +72,27 @@ echo ""
 echo "Checking for large files (>5MB)..."
 MAX_FILE_SIZE=5242880  # 5MB in bytes
 
+# numfmt is GNU coreutils: absent on stock macOS and on Git for Windows, where
+# it would print nothing and leave the warning reading "(...)". Fall back to
+# awk so the size is legible on every platform.
+human_size() {
+  if command -v numfmt >/dev/null 2>&1; then
+    numfmt --to=iec-i --suffix=B "$1"
+  else
+    awk -v b="$1" 'BEGIN {
+      split("B KiB MiB GiB TiB", u, " ")
+      i = 1
+      while (b >= 1024 && i < 5) { b /= 1024; i++ }
+      printf (i == 1 ? "%d%s\n" : "%.1f%s\n"), b, u[i]
+    }'
+  fi
+}
+
 while IFS= read -r file; do
   if [ -f "$file" ]; then
     size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
-    if [ "$size" -gt "$MAX_FILE_SIZE" ]; then
-      echo -e "${RED}✗ Large file detected: $file ($(numfmt --to=iec-i --suffix=B $size))${NC}"
+    if [ "${size:-0}" -gt "$MAX_FILE_SIZE" ]; then
+      echo -e "${RED}✗ Large file detected: $file ($(human_size "$size"))${NC}"
       echo "  Consider using Git LFS for large files"
       CHECKS_FAILED=1
     fi

@@ -10,9 +10,9 @@ function git_config() {
   local needs_config=false
 
   # Check if git config user file exists and ask user if they want to reconfigure
-  if [[ -f ./.config/git/.gitconfig.user ]] && git config --file ./.config/git/.gitconfig.user user.name >/dev/null 2>&1; then
-    local current_name=$(git config --file ./.config/git/.gitconfig.user user.name 2>/dev/null)
-    local current_email=$(git config --file ./.config/git/.gitconfig.user user.email 2>/dev/null)
+  if [[ -f "${DOTFILES_ROOT}/.config/git/.gitconfig.user" ]] && git config --file "${DOTFILES_ROOT}"/.config/git/.gitconfig.user user.name >/dev/null 2>&1; then
+    local current_name=$(git config --file "${DOTFILES_ROOT}/.config/git/.gitconfig.user" user.name 2>/dev/null)
+    local current_email=$(git config --file "${DOTFILES_ROOT}/.config/git/.gitconfig.user" user.email 2>/dev/null)
 
     if [[ -n "$current_name" && -n "$current_email" ]]; then
       bot "Git is already configured with:"
@@ -92,7 +92,7 @@ function git_config() {
     run "creating user-specific git configuration ($COL_YELLOW$fullname, $email, $githubuser$COL_RESET)"
 
     # Create .gitconfig.user with user credentials
-    cat > ./.config/git/.gitconfig.user << EOF
+    cat > "${DOTFILES_ROOT}/.config/git/.gitconfig.user" << EOF
 # User-specific git configuration
 # This file is not committed to the repository
 
@@ -112,20 +112,20 @@ EOF
       mv "$HOME/.gitconfig" "$HOME/.gitconfig.backup"
       echo "Existing .gitconfig backed up to .gitconfig.backup"
     fi
-    ln -s ~/.dotfiles/.config/git/.gitconfig "$HOME/.gitconfig"
+    ln -s "${DOTFILES_ROOT}/.config/git/.gitconfig" "$HOME/.gitconfig"
     ok "Global gitconfig linked to ~/.gitconfig"
   fi
 
   # Always ensure .gitconfig is linked to home directory (even if not reconfiguring)
   run "ensuring gitconfig is linked to home directory"
-  if [ ! -L "$HOME/.gitconfig" ] || [ "$(readlink "$HOME/.gitconfig")" != "$HOME/.dotfiles/.config/git/.gitconfig" ]; then
+  if [ ! -L "$HOME/.gitconfig" ] || [ "$(readlink "$HOME/.gitconfig")" != "${DOTFILES_ROOT}/.config/git/.gitconfig" ]; then
     if [ -L "$HOME/.gitconfig" ]; then
       rm "$HOME/.gitconfig"
     elif [ -f "$HOME/.gitconfig" ]; then
       mv "$HOME/.gitconfig" "$HOME/.gitconfig.backup.$(date +%s)"
       run "Existing .gitconfig backed up"
     fi
-    ln -s ~/.dotfiles/.config/git/.gitconfig "$HOME/.gitconfig"
+    ln -s "${DOTFILES_ROOT}/.config/git/.gitconfig" "$HOME/.gitconfig"
     ok "gitconfig linked to home directory"
   else
     ok "gitconfig already properly linked"
@@ -133,8 +133,8 @@ EOF
 
   # Ensure git subcommands are executable
   run "ensuring git subcommands are executable"
-  if [ -d "./.config/git/subcommands" ]; then
-    chmod +x ./.config/git/subcommands/git-* 2>/dev/null
+  if [ -d "${DOTFILES_ROOT}/.config/git/subcommands" ]; then
+    chmod +x "${DOTFILES_ROOT}"/.config/git/subcommands/git-* 2>/dev/null
     ok "git subcommands are executable"
   fi
 }

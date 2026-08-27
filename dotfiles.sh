@@ -12,8 +12,14 @@ set -e
 # INITIALIZATION AND SETUP
 ###############################################################################
 
+# Repo root, derived from this script's own location rather than assumed to be
+# ~/.dotfiles, so the checkout can live anywhere. Exported before bin/setup.sh
+# is sourced so every helper agrees on one root.
+DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export DOTFILES_ROOT
+
 # Check if we're in the dotfiles directory
-if [[ ! -f "./bin/setup.sh" ]]; then
+if [[ ! -f "${DOTFILES_ROOT}/bin/setup.sh" ]]; then
   echo "Error: Please run this script from the dotfiles directory"
   exit 1
 fi
@@ -53,7 +59,7 @@ case "$1" in
 esac
 
 # Include libraries
-source ./bin/setup.sh
+source "${DOTFILES_ROOT}/bin/setup.sh"
 
 ###############################################################################
 # PLATFORM DETECTION AND INITIALIZATION
@@ -83,6 +89,39 @@ function detect_platform() {
 
 detect_platform
 
+###############################################################################
+# CANONICAL ~/.dotfiles PATH
+###############################################################################
+
+# The scripts now derive their own root, but a few config files cannot: git
+# config has no variable expansion, so .config/git/.gitconfig spells out
+# ~/.dotfiles for hooksPath, excludesfile and the commit template, and
+# .zsh/.path.zsh does the same for the git-* subcommands. Point ~/.dotfiles at
+# the real checkout so those resolve wherever the repo actually lives.
+# (bootstrap.ps1 needs no equivalent - it derives every path from $PSScriptRoot.)
+if [[ "$DOTFILES_ROOT" != "$HOME/.dotfiles" ]]; then
+  if [[ -L "$HOME/.dotfiles" ]]; then
+    if [[ "$(readlink "$HOME/.dotfiles")" != "$DOTFILES_ROOT" ]]; then
+      run "Repointing ~/.dotfiles at $DOTFILES_ROOT"
+      rm -f "$HOME/.dotfiles"
+      ln -s "$DOTFILES_ROOT" "$HOME/.dotfiles"
+      ok "~/.dotfiles -> $DOTFILES_ROOT"
+    else
+      ok "~/.dotfiles already points at this checkout"
+    fi
+  elif [[ -e "$HOME/.dotfiles" ]]; then
+    # Never touch a real directory or file that is already there.
+    warn "~/.dotfiles exists and is not a symlink to this checkout."
+    warn "Git hooks, the global gitignore and the commit template resolve"
+    warn "through ~/.dotfiles, so they will point at the wrong place."
+    warn "Move it aside and re-run, or clone to ~/.dotfiles instead."
+  else
+    run "Linking ~/.dotfiles to $DOTFILES_ROOT"
+    ln -s "$DOTFILES_ROOT" "$HOME/.dotfiles"
+    ok "~/.dotfiles -> $DOTFILES_ROOT"
+  fi
+fi
+
 # Show installation mode
 if [[ "$UPDATE_MODE" == "true" ]]; then
   bot "Running in UPDATE mode - will refresh all settings and packages"
@@ -91,9 +130,9 @@ else
 fi
 
 # Clean up any existing error log from previous runs
-if [[ -f "${HOME}/.dotfiles/errors.log" ]]; then
+if [[ -f "${DOTFILES_ROOT}/errors.log" ]]; then
   run "Removing previous errors log"
-  rm -f "${HOME}/.dotfiles/errors.log"
+  rm -f "${DOTFILES_ROOT}/errors.log"
   ok "Previous error log removed"
 fi
 
@@ -280,11 +319,12 @@ else
   ok "starship already installed"
 fi
 # Install Maple Mono NF (prompt glyphs)
-if [ -f "$HOME/.dotfiles/bin/platform/fonts.sh" ]; then
+# Run as a subprocess rather than sourcing it: fonts.sh sets `-euo pipefail`
+# for its own safety, and sourcing would impose nounset/pipefail on every
+# step after this one.
+if [ -f "${DOTFILES_ROOT}/bin/platform/fonts.sh" ]; then
   run "Installing Maple Mono NF font"
-  # shellcheck source=bin/platform/fonts.sh
-  source "$HOME/.dotfiles/bin/platform/fonts.sh"
-  if install_fonts; then
+  if bash "${DOTFILES_ROOT}/bin/platform/fonts.sh"; then
     ok "Maple Mono NF ready"
   else
     warn "Font install failed - prompt glyphs will render as boxes"
@@ -565,23 +605,3 @@ bot "  ./dotfiles.sh         - Fresh installation"
 bot "  ./dotfiles.sh --update - Update existing configuration"
 bot ""
 bot "Enjoy your enhanced development environment! 🚀"
-
-echo ""
-
-if [[ "$UPDATE_MODE" == "true" ]]; then
-  success "✅ Dotfiles update completed successfully!"
-  bot "All configurations have been refreshed and packages updated."
-else
-  success "✅ Dotfiles installation completed successfully!"
-  bot "Your development environment is now configured."
-  bot "Please restart your terminal or run 'source ~/.zshrc' to apply changes."
-fi
-
-# Show error summary
-show_error_summary
-
-bot "Usage:"
-bot "  ./dotfiles.sh         - Fresh installation"
-bot "  ./dotfiles.sh --update - Update existing configuration"
-bot ""
-bot "Enjoy your enhanced development environment\! 🚀"

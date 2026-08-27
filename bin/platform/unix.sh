@@ -62,17 +62,27 @@ function unix_install() {
     return 1
   fi
 
-  run "Installing $package on $DISTRO"
-
-  if ! dpkg -l | grep -q "^ii  $package "; then
-    action "Installing $package with apt"
-    sudo apt install -y "$package"
-    if [[ $? -ne 0 ]]; then
-      error "Failed to install $package"
-      return 1
-    fi
-  else
+  if dpkg -l | grep -q "^ii  $package "; then
     ok "$package already installed"
+    return 0
+  fi
+
+  # Not every package in the shared list exists in the Debian/Ubuntu archives,
+  # and the set varies by release: starship is not packaged at all, eza only
+  # lands in Ubuntu 24.04 / Debian 13, git-delta in Ubuntu 23.04 / Debian 12.
+  # Check first so an older LTS reports a clean skip instead of an apt error.
+  # Where it matters there is a fallback (dotfiles.sh installs starship from
+  # starship.rs); the rest are guarded by `command -v` in .zsh/.tools.zsh.
+  if ! check_unix_package "$package"; then
+    warn "$package is not in the $DISTRO archives - skipping"
+    return 0
+  fi
+
+  run "Installing $package on $DISTRO"
+  action "Installing $package with apt"
+  if ! sudo apt install -y "$package"; then
+    error "Failed to install $package"
+    return 1
   fi
 }
 
@@ -82,6 +92,16 @@ function unix_installer_start() {
 
   # Configure locale first to avoid warnings
   setup_locale
+
+  # Refresh the package lists before anything else: unix_install decides
+  # whether to attempt a package by asking apt-cache, and that answer is only
+  # meaningful against current lists.
+  run "Refreshing apt package lists"
+  if sudo apt update >/dev/null 2>&1; then
+    ok "apt package lists refreshed"
+  else
+    warn "apt update failed - availability checks may be stale"
+  fi
 
   # Load configuration if not already loaded
   if [[ -z "${CONFIG_SETUP_PACKAGES_DEBIAN:-}" ]]; then

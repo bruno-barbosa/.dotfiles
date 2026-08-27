@@ -20,12 +20,17 @@
   autosetupmerge = true
 
 [merge]
-  tool = mvimdiff
+  # vimdiff, not mvimdiff: MacVim only exists on macOS, so selecting it by
+  # default left `git mergetool` broken on Linux and Windows. vim is present
+  # on all three (Git for Windows bundles it). The mvimdiff definition is kept
+  # below so `git mergetool -t mvimdiff` still works where MacVim is installed.
+  tool = vimdiff
   summary = true
   verbosity = 1
 
 [mergetool]
   prompt = false
+  keepBackup = false
 
 [mergetool "mvimdiff"]
   cmd = "mvim -c 'Gdiff' $MERGED"

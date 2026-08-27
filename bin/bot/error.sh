@@ -5,7 +5,7 @@
 ######################################
 
 # Initialize error log file (will be set up after OS detection)
-ERROR_LOG="${HOME}/.dotfiles/errors.log"
+ERROR_LOG="${DOTFILES_ROOT:-$HOME/.dotfiles}/errors.log"
 
 # Function to initialize error log (only called when first error occurs)
 function init_error_log() {
