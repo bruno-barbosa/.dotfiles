@@ -103,7 +103,7 @@ setup:
 
       # Productivity apps (GUI apps - will be installed as casks)
       - raycast
-      - iterm2
+      - ghostty
 
       # Media and graphics (GUI apps - will be installed as casks)
       - vlc
