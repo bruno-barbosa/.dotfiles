@@ -19,7 +19,7 @@ jobs:
     name: shell scripts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Collect shell scripts
         id: collect
@@ -73,7 +73,7 @@ jobs:
     name: powershell
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Parse .ps1 files
         shell: pwsh
@@ -110,7 +110,7 @@ jobs:
     name: config files
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: config.yaml parses and has every platform section
         run: |
