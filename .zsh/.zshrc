@@ -26,8 +26,10 @@ ZSH_COLORIZE_STYLE="colorful"
 # Uncomment the following line to disable auto-setting terminal title.
 # DISABLE_AUTO_TITLE="true"
 
-# Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+# Command auto-correction is off: it prompts "did you mean ...?" on anything it
+# does not recognise, which fires constantly on git subcommands and one-off
+# binaries. Set to "true" to bring it back.
+ENABLE_CORRECTION="false"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
@@ -44,7 +46,18 @@ HIST_STAMPS="yyyy-mm-dd"
 HISTFILE="${HOME}/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000
-setopt appendhistory
+
+# Kept in step with the PSReadLine options in .pwsh/profile.ps1, so history
+# behaves the same in both shells: same depth (MaximumHistoryCount 10000),
+# no duplicates (-HistoryNoDuplicates), and writes that survive several
+# terminals open at once.
+setopt APPEND_HISTORY          # add to the file, never truncate it
+setopt INC_APPEND_HISTORY      # write as commands run, not just at exit
+setopt SHARE_HISTORY           # new shells pick up other sessions' commands
+setopt HIST_IGNORE_ALL_DUPS    # a repeated command keeps only its newest entry
+setopt HIST_IGNORE_SPACE       # leading space keeps a command out of history
+setopt HIST_REDUCE_BLANKS      # tidy up whitespace before storing
+setopt HIST_VERIFY             # expand !! onto the line instead of running it
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder

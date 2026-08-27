@@ -39,12 +39,16 @@ case "$1" in
     echo "  ./dotfiles.sh --help   - Show this help message"
     echo ""
     echo "Features:"
-    echo "  - Cross-platform support (macOS/Linux)"
-    echo "  - Package manager setup (Homebrew/apt)"
+    echo "  - Package manager setup (Homebrew on macOS, apt on Linux)"
     echo "  - Version managers (Volta, Ruby, pyenv)"
     echo "  - Zsh configuration with oh-my-zsh + starship prompt"
+    echo "  - Modern CLI: zoxide, eza, bat, fzf, delta"
     echo "  - Tmux configuration"
     echo "  - Git configuration"
+    echo ""
+    echo "Windows is installed separately:"
+    echo "  .\\.pwsh\\bootstrap.ps1          - Fresh installation"
+    echo "  .\\.pwsh\\bootstrap.ps1 -Update  - Update existing configuration"
     echo ""
     exit 0
     ;;

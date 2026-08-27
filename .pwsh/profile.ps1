@@ -24,6 +24,38 @@ Add-ToPath (Join-Path $HOME '.cargo\bin')
 Add-ToPath (Join-Path $HOME '.volta\bin')
 Add-ToPath (Join-Path $HOME 'go\bin')
 
+# ------------------------------------------------------------- init caching
+# Several tools want a subprocess at every shell start purely to print a static
+# init script. Cache that output, keyed on the binary's timestamp so an upgrade
+# regenerates it, and dot-source the cache instead.
+#
+# The key means each upgrade produces a new filename, so prune the previous
+# ones on the way past -- otherwise every starship/zoxide/volta upgrade leaves
+# another file in ~/.cache/pwsh forever.
+$script:PwshCacheDir = Join-Path $HOME '.cache\pwsh'
+
+function Use-CachedInit {
+    param(
+        [string]$Prefix,          # e.g. 'starship-init'
+        [string]$BinaryPath,      # keyed on this file's mtime
+        [scriptblock]$Generate    # emits the init text
+    )
+    $stamp     = (Get-Item $BinaryPath).LastWriteTime.Ticks
+    $cacheFile = Join-Path $script:PwshCacheDir "$Prefix-$stamp.ps1"
+
+    if (-not (Test-Path $cacheFile)) {
+        if (-not (Test-Path $script:PwshCacheDir)) {
+            New-Item -ItemType Directory $script:PwshCacheDir -Force | Out-Null
+        }
+        (& $Generate) | Out-String | Set-Content -Path $cacheFile -Encoding UTF8
+        # Only prune once we have a fresh file to replace them with.
+        Get-ChildItem -Path $script:PwshCacheDir -Filter "$Prefix-*.ps1" -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -ne $cacheFile } |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+    }
+    return $cacheFile
+}
+
 # ------------------------------------------------------------------- prompt
 # same starship.toml the zsh side uses -- one prompt on all three platforms
 $env:STARSHIP_CONFIG = Join-Path $env:DOTFILES '.config\starship\starship.toml'
@@ -31,18 +63,10 @@ if ($starshipCmd = Get-Command starship -ErrorAction SilentlyContinue) {
     # `starship init powershell` returns a 128-char bootstrap that launches
     # starship a SECOND time with --print-full-init: two process spawns per
     # shell start, ~460ms on Windows PowerShell 5.1. Ask for the full init
-    # once and cache it, keyed on the binary's timestamp so an upgrade
-    # regenerates automatically. Dot-sourcing the cache is ~90ms.
+    # once and cache it. Dot-sourcing the cache is ~90ms.
     try {
-        $stamp     = (Get-Item $starshipCmd.Source).LastWriteTime.Ticks
-        $cacheDir  = Join-Path $HOME '.cache\pwsh'
-        $cacheFile = Join-Path $cacheDir "starship-init-$stamp.ps1"
-        if (-not (Test-Path $cacheFile)) {
-            if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory $cacheDir -Force | Out-Null }
-            (& $starshipCmd.Source init powershell --print-full-init) | Out-String |
-                Set-Content -Path $cacheFile -Encoding UTF8
-        }
-        . $cacheFile
+        . (Use-CachedInit -Prefix 'starship-init' -BinaryPath $starshipCmd.Source `
+            -Generate { & $starshipCmd.Source init powershell --print-full-init })
     } catch {
         Invoke-Expression (&starship init powershell)
     }
@@ -136,15 +160,8 @@ if ($zoxideCmd = Get-Command zoxide -ErrorAction SilentlyContinue) {
     # Cached for the same reason as starship: the init is static, so there is
     # no need to spawn zoxide on every shell start.
     try {
-        $stamp     = (Get-Item $zoxideCmd.Source).LastWriteTime.Ticks
-        $cacheDir  = Join-Path $HOME '.cache\pwsh'
-        $cacheFile = Join-Path $cacheDir "zoxide-init-$stamp.ps1"
-        if (-not (Test-Path $cacheFile)) {
-            if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory $cacheDir -Force | Out-Null }
-            (& $zoxideCmd.Source init powershell --cmd cd) | Out-String |
-                Set-Content -Path $cacheFile -Encoding UTF8
-        }
-        . $cacheFile
+        . (Use-CachedInit -Prefix 'zoxide-init' -BinaryPath $zoxideCmd.Source `
+            -Generate { & $zoxideCmd.Source init powershell --cmd cd })
     } catch {
         Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
     }
@@ -174,18 +191,10 @@ if ($voltaCmd = Get-Command volta -ErrorAction SilentlyContinue) {
 
     # `volta completions powershell` emits ~15KB and costs a subprocess on
     # every shell start, which is noticeable on Windows PowerShell 5.1.
-    # Cache it, keyed on the binary's timestamp so a volta upgrade
-    # regenerates it automatically. No subprocess on the common path.
+    # No subprocess on the common path.
     try {
-        $stamp     = (Get-Item $voltaCmd.Source).LastWriteTime.Ticks
-        $cacheDir  = Join-Path $HOME '.cache\pwsh'
-        $cacheFile = Join-Path $cacheDir "volta-completions-$stamp.ps1"
-        if (-not (Test-Path $cacheFile)) {
-            if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory $cacheDir -Force | Out-Null }
-            (& volta completions powershell) | Out-String |
-                Set-Content -Path $cacheFile -Encoding UTF8
-        }
-        . $cacheFile
+        . (Use-CachedInit -Prefix 'volta-completions' -BinaryPath $voltaCmd.Source `
+            -Generate { & $voltaCmd.Source completions powershell })
     } catch { }
 }
 # ---------------------------------------------------- git aliases (.git.alias.zsh)

@@ -1,0 +1,146 @@
+name: lint
+
+# The pre-commit hook runs shellcheck only when it happens to be installed, so
+# nothing actually enforced it. These are the checks that would have caught the
+# bugs fixed in 744b919: a sourced script leaking `set -euo pipefail` into the
+# installer, and a completion block duplicated at the end of dotfiles.sh.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    name: shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect shell scripts
+        id: collect
+        run: |
+          # Tracked shell scripts plus the extensionless hooks and git-* subcommands.
+          {
+            git ls-files '*.sh' '*.bash'
+            git ls-files '.config/git/hooks/*' '.config/git/subcommands/*'
+          } | sort -u > /tmp/shfiles
+          echo "found $(wc -l < /tmp/shfiles) files:"
+          cat /tmp/shfiles
+
+      - name: bash -n (parse check)
+        run: |
+          rc=0
+          while IFS= read -r f; do
+            head -n1 "$f" | grep -qE '^#!.*(bash|sh)' || continue
+            bash -n "$f" || { echo "::error file=$f::bash -n failed"; rc=1; }
+          done < /tmp/shfiles
+          exit $rc
+
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+
+      # Gating level. These scripts predate any linting, so `-S warning` still
+      # has a backlog (SC2155 `local x=$(...)` and friends). Errors are the
+      # things that are actually broken, and the repo is clean at that level --
+      # so that is what blocks a merge.
+      # -e SC1091: sourced paths only resolve on an installed machine.
+      - name: shellcheck (errors - blocking)
+        run: |
+          shellcheck --version
+          rc=0
+          while IFS= read -r f; do
+            head -n1 "$f" | grep -qE '^#!.*(bash|sh)' || continue
+            shellcheck -S error -e SC1091 -x "$f" || rc=1
+          done < /tmp/shfiles
+          exit $rc
+
+      # Advisory. Prints the backlog on every run without failing the build;
+      # flip this to blocking once it reaches zero.
+      - name: shellcheck (warnings - advisory)
+        continue-on-error: true
+        run: |
+          while IFS= read -r f; do
+            head -n1 "$f" | grep -qE '^#!.*(bash|sh)' || continue
+            shellcheck -S warning -e SC1091 -x "$f" || true
+          done < /tmp/shfiles
+
+  powershell:
+    name: powershell
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse .ps1 files
+        shell: pwsh
+        run: |
+          $failed = $false
+          Get-ChildItem -Recurse -Filter *.ps1 |
+            Where-Object { $_.FullName -notmatch '\\\.git\\' } |
+            ForEach-Object {
+              $errors = $null
+              [void][System.Management.Automation.Language.Parser]::ParseFile(
+                $_.FullName, [ref]$null, [ref]$errors)
+              if ($errors -and $errors.Count) {
+                $failed = $true
+                Write-Host "::error file=$($_.FullName)::$($errors.Count) parse error(s)"
+                $errors | ForEach-Object { Write-Host "  line $($_.Extent.StartLineNumber): $($_.Message)" }
+              } else {
+                Write-Host "ok: $($_.Name)"
+              }
+            }
+          if ($failed) { exit 1 }
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -SkipPublisherCheck
+          # Write-Host is deliberate throughout the bootstrap: this is console
+          # output for a human, not pipeline data.
+          $r = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error `
+                 -ExcludeRule PSAvoidUsingWriteHost
+          if ($r) { $r | Format-Table -AutoSize | Out-String | Write-Host; exit 1 }
+          Write-Host "PSScriptAnalyzer: clean"
+
+  config:
+    name: config files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: config.yaml parses and has every platform section
+        run: |
+          sudo snap install yq
+          for section in shared debian osx windows gems pip node; do
+            n=$(yq e ".setup.packages.$section | length" .config/config.yaml)
+            [ "$n" != "null" ] && [ "$n" -gt 0 ] \
+              && echo "ok: $section ($n packages)" \
+              || { echo "::error::setup.packages.$section missing or empty"; exit 1; }
+          done
+
+      - name: gitconfig parses
+        run: |
+          git config --file .config/git/.gitconfig --list > /dev/null
+          git config --file .config/git/catppuccin-delta.gitconfig --list > /dev/null
+          echo "ok: git config files parse"
+
+      - name: JSON files parse
+        run: |
+          for f in $(git ls-files '*.json'); do
+            python3 -c "import json,sys; json.load(open('$f'))" \
+              && echo "ok: $f" \
+              || { echo "::error file=$f::invalid JSON"; exit 1; }
+          done
+
+      - name: starship.toml parses
+        run: |
+          python3 -c "
+          import sys, tomllib
+          with open('.config/starship/starship.toml','rb') as f:
+              tomllib.load(f)
+          print('ok: starship.toml')
+          "

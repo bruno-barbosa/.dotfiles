@@ -7,6 +7,15 @@
 # Ignore errors log
 /errors.log
 
+# vim-plug owns .vim/plugged and clones the plugins itself (see .vimrc and the
+# PlugInstall step in dotfiles.sh). These were tracked as gitlinks with no
+# .gitmodules, so a fresh clone got 11 empty directories that no submodule
+# command could populate, and every PlugUpdate produced pointer churn.
+/.vim/plugged/
+
+# vim-plug itself is downloaded by dotfiles.sh
+/.vim/autoload/plug.vim
+
 # Ignore vim swap files
 *.swp
 *.swo

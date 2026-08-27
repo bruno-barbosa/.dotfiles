@@ -22,6 +22,10 @@ setup:
       - bat
       - git-delta
 
+      # Linting for the shell scripts in this repo; the pre-commit hook and
+      # CI both run it, and it silently skips where it is missing.
+      - shellcheck
+
     debian:
       # Essential development packages
       - build-essential
@@ -127,6 +131,7 @@ setup:
       - fd
       - jq
       - less
+      - shellcheck
       # nerd-fonts bucket
       - MapleMono-NF
     gems:

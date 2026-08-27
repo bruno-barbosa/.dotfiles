@@ -6,15 +6,26 @@
     .config/config.yaml, installs the PowerShell modules, and points
     $PROFILE at .pwsh/profile.ps1.
     Safe to re-run; every step is idempotent.
+.PARAMETER Update
+    Counterpart to `dotfiles.sh --update`: refreshes scoop itself and upgrades
+    every installed package before the usual idempotent steps run.
+.PARAMETER MergeTerminalSettings
+    Merges the profile defaults from .pwsh/windows-terminal.md into Windows
+    Terminal's settings.json. Off by default because Terminal rewrites that
+    file itself; see the doc for what gets changed.
 .EXAMPLE
     .\.pwsh\bootstrap.ps1
+    .\.pwsh\bootstrap.ps1 -Update
     .\.pwsh\bootstrap.ps1 -SkipPackages
+    .\.pwsh\bootstrap.ps1 -MergeTerminalSettings
 #>
 [CmdletBinding()]
 param(
+    [switch]$Update,
     [switch]$SkipPackages,
     [switch]$SkipModules,
-    [switch]$SkipProfile
+    [switch]$SkipProfile,
+    [switch]$MergeTerminalSettings
 )
 
 $ErrorActionPreference = 'Stop'
@@ -27,6 +38,7 @@ function Warn { param($m) Write-Host "  [!!] $m" -ForegroundColor Yellow }
 Write-Host ""
 Write-Host "  dotfiles :: windows bootstrap" -ForegroundColor Magenta
 Write-Host "  root: $DotfilesRoot"
+if ($Update) { Write-Host "  mode: UPDATE" -ForegroundColor Yellow }
 Write-Host ""
 
 # ------------------------------------------------------------------ scoop
@@ -35,6 +47,24 @@ if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
     Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
     Ok "scoop installed"
 } else { Ok "scoop present" }
+
+# ----------------------------------------------------------- update mode
+# `dotfiles.sh --update` refreshes brew/apt; this is the scoop equivalent.
+# Runs before the install loop so newly-listed packages still get picked up.
+if ($Update -and -not $SkipPackages) {
+    Say "updating scoop and installed packages"
+    try {
+        scoop update  *>$null
+        scoop update * 2>&1 | ForEach-Object { Write-Verbose $_ }
+        Ok "scoop packages upgraded"
+    } catch {
+        Warn "scoop update failed: $($_.Exception.Message)"
+    }
+    try {
+        scoop cleanup * *>$null
+        Ok "old package versions cleaned up"
+    } catch { }
+}
 
 # --------------------------------------------- packages from config.yaml
 function Get-WindowsPackages {
@@ -95,11 +125,18 @@ if (-not $SkipModules) {
         Say "upgrading PSReadLine (predictive intellisense)"
         Install-Module PSReadLine -MinimumVersion 2.3.4 -SkipPublisherCheck -Force -Scope CurrentUser -AllowClobber
     }
+    if ($Update) {
+        Say "updating PSReadLine"
+        try { Update-Module PSReadLine -Force -ErrorAction Stop } catch { Warn "PSReadLine update: $($_.Exception.Message)" }
+    }
     Ok "PSReadLine $((Get-Module PSReadLine -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version)"
 
     if (-not (Get-Module PSFzf -ListAvailable)) {
         Say "installing PSFzf"
         Install-Module PSFzf -Force -Scope CurrentUser -AllowClobber
+    } elseif ($Update) {
+        Say "updating PSFzf"
+        try { Update-Module PSFzf -Force -ErrorAction Stop } catch { Warn "PSFzf update: $($_.Exception.Message)" }
     }
     Ok "PSFzf present"
 }
@@ -143,8 +180,96 @@ if (Get-Command bat -ErrorAction SilentlyContinue) {
     Ok "bat theme cache built"
 }
 
+# ------------------------------------------------- Windows Terminal (opt-in)
+# Off by default: Terminal owns settings.json and rewrites it on every UI
+# change. This merges into the existing document rather than replacing it --
+# the scheme and theme are matched by name and updated in place, and only the
+# four profiles.defaults keys the doc calls for are touched. Anything set
+# through the GUI survives. A timestamped backup is written first regardless.
+function Merge-TerminalSettings {
+    param([string]$FragmentPath)
+
+    $candidates = @(
+        "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json",
+        "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json",
+        "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json"
+    )
+    $settingsPath = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $settingsPath) {
+        Warn "Windows Terminal settings.json not found - is it installed and launched once?"
+        return
+    }
+    if (-not (Test-Path $FragmentPath)) {
+        Warn "fragment not found: $FragmentPath"
+        return
+    }
+
+    $frag = Get-Content $FragmentPath -Raw | ConvertFrom-Json
+    $raw  = Get-Content $settingsPath -Raw
+    try {
+        $settings = $raw | ConvertFrom-Json
+    } catch {
+        Warn "settings.json did not parse - leaving it alone: $($_.Exception.Message)"
+        return
+    }
+
+    $backup = "$settingsPath.pre-dotfiles.bak"
+    Copy-Item $settingsPath $backup -Force
+    Ok "backed up -> $backup"
+
+    # -- schemes: replace the entry with our name, else append
+    if (-not $settings.PSObject.Properties['schemes']) {
+        $settings | Add-Member -NotePropertyName schemes -NotePropertyValue @()
+    }
+    $schemes = @($settings.schemes | Where-Object { $_.name -ne $frag.scheme.name })
+    $settings.schemes = @($schemes + $frag.scheme)
+
+    # -- themes: same treatment
+    if (-not $settings.PSObject.Properties['themes']) {
+        $settings | Add-Member -NotePropertyName themes -NotePropertyValue @()
+    }
+    $themes = @($settings.themes | Where-Object { $_.name -ne $frag.theme.name })
+    $settings.themes = @($themes + $frag.theme)
+
+    # -- top level
+    foreach ($p in $frag.topLevel.PSObject.Properties) {
+        if ($settings.PSObject.Properties[$p.Name]) { $settings.($p.Name) = $p.Value }
+        else { $settings | Add-Member -NotePropertyName $p.Name -NotePropertyValue $p.Value }
+    }
+
+    # -- profiles.defaults
+    if (-not $settings.PSObject.Properties['profiles']) {
+        $settings | Add-Member -NotePropertyName profiles -NotePropertyValue ([pscustomobject]@{})
+    }
+    if (-not $settings.profiles.PSObject.Properties['defaults']) {
+        $settings.profiles | Add-Member -NotePropertyName defaults -NotePropertyValue ([pscustomobject]@{})
+    }
+    foreach ($p in $frag.profileDefaults.PSObject.Properties) {
+        if ($settings.profiles.defaults.PSObject.Properties[$p.Name]) {
+            $settings.profiles.defaults.($p.Name) = $p.Value
+        } else {
+            $settings.profiles.defaults | Add-Member -NotePropertyName $p.Name -NotePropertyValue $p.Value
+        }
+    }
+
+    # Depth 32: Terminal's actions/keybindings nest deeply and the default of 2
+    # would silently flatten them to type names.
+    $json = $settings | ConvertTo-Json -Depth 32
+    [System.IO.File]::WriteAllText($settingsPath, $json, (New-Object System.Text.UTF8Encoding($false)))
+    Ok "merged Catppuccin Mocha + Maple Mono NF -> $settingsPath"
+    Write-Host "  restore with: Copy-Item '$backup' '$settingsPath' -Force"
+}
+
+if ($MergeTerminalSettings) {
+    Say "merging Windows Terminal settings"
+    Merge-TerminalSettings -FragmentPath (Join-Path $DotfilesRoot '.config\windows-terminal\catppuccin-mocha.json')
+}
+
 Write-Host ""
 Ok "done -- open a new terminal tab"
-Write-Host "  Windows Terminal settings are NOT applied automatically."
-Write-Host "  See .pwsh/windows-terminal.md to merge them."
+if (-not $MergeTerminalSettings) {
+    Write-Host "  Windows Terminal settings were NOT touched."
+    Write-Host "  Run with -MergeTerminalSettings to apply them, or see"
+    Write-Host "  .pwsh/windows-terminal.md to do it by hand."
+}
 Write-Host ""
