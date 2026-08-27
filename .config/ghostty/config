@@ -1,0 +1,6 @@
+working-directory = home
+
+font-family = Maple Mono NF
+font-size = 13
+
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha

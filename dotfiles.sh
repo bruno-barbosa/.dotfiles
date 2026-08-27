@@ -330,6 +330,26 @@ if [ -f "${DOTFILES_ROOT}/bin/platform/fonts.sh" ]; then
     warn "Font install failed - prompt glyphs will render as boxes"
   fi
 fi
+
+# Link Ghostty config (macOS only -- Ghostty reads ~/.config/ghostty/config
+# directly; unlike starship there is no env var to point at the repo copy.)
+if [[ "$IS_MACOS" == "true" ]]; then
+  ghostty_src="${DOTFILES_ROOT}/.config/ghostty/config"
+  ghostty_dst="$HOME/.config/ghostty/config"
+  if [ -f "$ghostty_src" ]; then
+    run "Linking Ghostty configuration"
+    mkdir -p "$(dirname "$ghostty_dst")"
+    if [ -L "$ghostty_dst" ] || [ ! -e "$ghostty_dst" ]; then
+      ln -sfn "$ghostty_src" "$ghostty_dst"
+      ok "Ghostty config linked"
+    elif [ -f "$ghostty_dst" ]; then
+      # Real file already there: back it up rather than clobber it.
+      mv "$ghostty_dst" "$ghostty_dst.backup-$(date +%Y%m%d%H%M%S)"
+      ln -sfn "$ghostty_src" "$ghostty_dst"
+      ok "Ghostty config linked (previous config backed up)"
+    fi
+  fi
+fi
 # Install zsh plugins
 run "Installing zsh plugins"
 
