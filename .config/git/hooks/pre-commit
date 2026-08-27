@@ -103,18 +103,49 @@ echo ""
 ###########################################
 
 # ESLint for JavaScript/TypeScript
-if command -v eslint >/dev/null 2>&1; then
-  echo "Running ESLint..."
-  JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$')
-  if [ -n "$JS_FILES" ]; then
-    if ! eslint $JS_FILES; then
-      echo -e "${RED}✗ ESLint failed${NC}"
-      CHECKS_FAILED=1
-    else
-      echo -e "${GREEN}✓ ESLint passed${NC}"
+# Only run when the repo actually has an ESLint config; otherwise a global
+# eslint on PATH would hard-fail every config-less repo (ESLint 9+ errors out
+# when it can't find eslint.config.*). Prefer the repo-local eslint over global.
+ESLINT_HAS_CONFIG=0
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -n "$REPO_ROOT" ]; then
+  for cfg in eslint.config.js eslint.config.mjs eslint.config.cjs eslint.config.ts \
+             .eslintrc .eslintrc.js .eslintrc.cjs .eslintrc.json .eslintrc.yml .eslintrc.yaml; do
+    if [ -f "$REPO_ROOT/$cfg" ]; then
+      ESLINT_HAS_CONFIG=1
+      break
     fi
+  done
+  # Also honor an eslintConfig field in package.json.
+  if [ "$ESLINT_HAS_CONFIG" -eq 0 ] && [ -f "$REPO_ROOT/package.json" ] \
+     && grep -q '"eslintConfig"' "$REPO_ROOT/package.json" 2>/dev/null; then
+    ESLINT_HAS_CONFIG=1
   fi
-  echo ""
+fi
+
+if [ "$ESLINT_HAS_CONFIG" -eq 1 ]; then
+  # Prefer the repo-local eslint; fall back to a global one if present.
+  if [ -x "$REPO_ROOT/node_modules/.bin/eslint" ]; then
+    ESLINT_BIN="$REPO_ROOT/node_modules/.bin/eslint"
+  elif command -v eslint >/dev/null 2>&1; then
+    ESLINT_BIN="eslint"
+  else
+    ESLINT_BIN=""
+  fi
+
+  if [ -n "$ESLINT_BIN" ]; then
+    echo "Running ESLint..."
+    JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$')
+    if [ -n "$JS_FILES" ]; then
+      if ! "$ESLINT_BIN" $JS_FILES; then
+        echo -e "${RED}✗ ESLint failed${NC}"
+        CHECKS_FAILED=1
+      else
+        echo -e "${GREEN}✓ ESLint passed${NC}"
+      fi
+    fi
+    echo ""
+  fi
 fi
 
 # Rubocop for Ruby
