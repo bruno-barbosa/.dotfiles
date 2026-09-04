@@ -1,3 +1,13 @@
+# This file is zsh-only: setopt, autoload, zle, bindkey and oh-my-zsh itself
+# have no bash equivalents, so sourcing it from bash spewed a page of
+# "command not found" before dying on the first zsh-only conditional. Bail out
+# with one line that says what to run instead. `return` covers a `source`d
+# file; the `exit` fallback covers someone running this file directly.
+if [ -z "${ZSH_VERSION:-}" ]; then
+  echo "~/.zshrc is zsh-only and this shell is not zsh. Run 'exec zsh' instead." >&2
+  return 1 2>/dev/null || exit 1
+fi
+
 export ZSH="$HOME/.oh-my-zsh"
 
 source $HOME/.dotfiles/.zsh/.sources.zsh

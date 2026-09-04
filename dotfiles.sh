@@ -306,6 +306,54 @@ else
   ok "oh-my-zsh already installed"
 fi
 
+# Make zsh the login shell.
+#
+# Everything this installer configures -- oh-my-zsh, starship, the aliases, the
+# plugins -- lives in .zshrc. On a box that still logs you into bash (the
+# default on Ubuntu, and so on WSL) none of it ever loads, and the obvious
+# workaround, `source ~/.zshrc` from bash, only produces errors: the file is
+# full of zsh-only syntax. Changing the login shell is the actual fix.
+zsh_path="$(command -v zsh || true)"
+if [ -z "$zsh_path" ]; then
+  warn "zsh is not installed - skipping login shell change"
+else
+  # Read the shell out of passwd rather than $SHELL: $SHELL is inherited from
+  # whatever started this script, so it still says bash inside a zsh you
+  # launched by hand, and vice versa.
+  current_shell=""
+  if command -v getent >/dev/null 2>&1; then
+    current_shell="$(getent passwd "$(id -un)" | cut -d: -f7)"
+  fi
+  [ -n "$current_shell" ] || current_shell="$SHELL"
+
+  if [ "$current_shell" = "$zsh_path" ]; then
+    ok "zsh is already the login shell"
+  else
+    printf "Make zsh your login shell? (currently %s) [Y|n] " "$current_shell"
+    read -r shell_response
+
+    if [[ ! $shell_response =~ ^(n|no|N) ]]; then
+      # chsh refuses any shell missing from /etc/shells.
+      if ! grep -qxF "$zsh_path" /etc/shells 2>/dev/null; then
+        run "Registering $zsh_path in /etc/shells"
+        echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+      fi
+
+      run "Changing login shell to zsh"
+      if chsh -s "$zsh_path"; then
+        ok "Login shell set to zsh - takes effect in your next session"
+      else
+        warn "Could not change the login shell automatically"
+        bot "Run it yourself: chsh -s $zsh_path"
+        log_error "chsh failed" "could not set $zsh_path as login shell for $(id -un)"
+      fi
+    else
+      warn "Login shell left as $current_shell"
+      bot "None of the zsh config will load there - start a session with 'exec zsh'."
+    fi
+  fi
+fi
+
 # Install starship prompt
 # Replaces powerlevel10k: starship runs on macOS, Linux and Windows from a
 # single .config/starship/starship.toml, so the prompt is identical on every
@@ -618,7 +666,9 @@ if [[ "$UPDATE_MODE" == "true" ]]; then
 else
   success "✅ Dotfiles installation completed successfully!"
   bot "Your development environment is now configured."
-  bot "Please restart your terminal or run 'source ~/.zshrc' to apply changes."
+  # Never "source ~/.zshrc": it is zsh-only, and the shell you ran this from
+  # is bash. Starting a zsh is the only way to pick the config up in place.
+  bot "Please restart your terminal, or run 'exec zsh' to apply changes now."
 fi
 
 # Show error summary
