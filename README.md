@@ -19,7 +19,7 @@ Modern, comprehensive dotfiles setup for macOS, Linux and Windows development en
 
 - **Volta**: Modern Node.js toolchain manager (replaces nvm)
 - **RVM**: Ruby Version Manager with gem configuration
-- **pyenv**: Python Version Manager with pip packages
+- **uv**: Python toolchain manager - installs and pins CPython, resolves project dependencies, and keeps global CLI tools in isolated environments (pyenv + pip + pipx in one binary)
 
 #### **Shell Environment**
 
@@ -124,7 +124,7 @@ The installer provides interactive prompts for each component:
 - **🍎 Platform Defaults**: System preferences optimization (macOS only)
 - **📝 Vim Editor Setup**: Vim with vim-plug and essential plugins
 - **⚙️ Git Configuration**: User settings and global gitignore
-- **🔄 Version Managers**: Volta (Node.js), RVM (Ruby), pyenv (Python)
+- **🔄 Version Managers**: Volta (Node.js), RVM (Ruby), uv (Python)
 
 ## 📁 Configuration
 
@@ -143,7 +143,7 @@ setup:
 
     debian:
       - build-essential
-      - python3-dev
+      - libffi-dev
 
     osx:
       - gh
@@ -155,8 +155,8 @@ setup:
       - rake
       - rubocop
 
-    pip:
-      - pip
+    python: # global CLI tools, installed with `uv tool install`
+      - ruff
       - black
       - pytest
 
@@ -165,6 +165,27 @@ setup:
       - eslint
       - prettier
 ```
+
+### Python (uv)
+
+There is no pyenv, no global pip and no `python3 -m venv` here — `uv` covers
+all three, and it is the only Python thing the installer puts on the machine.
+
+```bash
+uv python install 3.13     # install an interpreter
+uv init myproject          # start a project (writes pyproject.toml)
+uv add requests            # add a dependency, lockfile and venv handled for you
+uv run pytest              # run inside the project environment
+uvx ruff check .           # run a tool without installing it
+uv tool install ruff       # install a CLI tool globally, in its own venv
+```
+
+Global CLI tools live under `setup.packages.python` in `.config/config.yaml`
+and are installed with `uv tool install`. Libraries do not belong there — they
+belong to a project (`uv add`) or to a one-off run (`uv run --with`).
+
+Aliases are in `.zsh/aliases/.python.alias.zsh`; `py` opens a REPL on the
+managed interpreter without needing a project.
 
 ### Shell Customization
 
@@ -205,7 +226,7 @@ The dotfiles support selective updates:
 │   ├── git/              # Git configuration
 │   ├── node/             # Volta (Node.js) setup
 │   ├── ruby/             # Ruby/RVM setup with permissions fix
-│   ├── python/           # Python/pyenv setup
+│   ├── python/           # Python toolchain setup (uv)
 │   └── platform/         # Platform-specific (macOS/Linux/fonts)
 ├── .pwsh/                # Windows arm
 │   ├── bootstrap.ps1     # Installer (counterpart to dotfiles.sh)

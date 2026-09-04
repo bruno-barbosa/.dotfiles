@@ -197,6 +197,25 @@ if ($voltaCmd = Get-Command volta -ErrorAction SilentlyContinue) {
             -Generate { & $voltaCmd.Source completions powershell })
     } catch { }
 }
+
+# ---------------------------------------------------------------------- uv
+# Python toolchain -- the counterpart to the uv block in .zsh/.tools.zsh.
+# uv needs no init hook (no shims, single binary), so this is completions
+# only, cached like the others to keep them off the startup path.
+if ($uvCmd = Get-Command uv -ErrorAction SilentlyContinue) {
+    try {
+        . (Use-CachedInit -Prefix 'uv-completions' -BinaryPath $uvCmd.Source `
+            -Generate { & $uvCmd.Source generate-shell-completion powershell })
+    } catch { }
+
+    # uvx is a separate binary with its own completion namespace.
+    if ($uvxCmd = Get-Command uvx -ErrorAction SilentlyContinue) {
+        try {
+            . (Use-CachedInit -Prefix 'uvx-completions' -BinaryPath $uvxCmd.Source `
+                -Generate { & $uvxCmd.Source --generate-shell-completion powershell })
+        } catch { }
+    }
+}
 # ---------------------------------------------------- git aliases (.git.alias.zsh)
 function gs  { git status @args }
 function gd  { git diff @args }

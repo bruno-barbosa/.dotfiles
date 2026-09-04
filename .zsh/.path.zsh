@@ -6,8 +6,10 @@ export GOPATH=$HOME/.go
 # Node environments (Volta)
 export VOLTA_HOME="$HOME/.volta"
 
-# Python environments (pyenv)
-export PYENV_ROOT="$HOME/.pyenv"
+# Python toolchain (uv). Where `uv tool install` links tool entry points --
+# this is uv's own default, pinned so it stays put if XDG_BIN_HOME is ever
+# set. The directory itself is added to PATH below.
+export UV_TOOL_BIN_DIR="$HOME/.local/bin"
 
 # Platform-specific environment variables
 if [[ "$IS_MACOS" == "true" ]]; then
@@ -30,7 +32,6 @@ add_to_path "$HOME/.dotfiles/.config/git/subcommands"
 # Version managers
 add_to_path "$VOLTA_HOME/bin"
 add_to_path "$HOME/.rbenv/bin"
-add_to_path "$HOME/.pyenv/bin"
 
 # Go paths
 add_to_path "$HOME/.go/bin"
@@ -54,13 +55,8 @@ elif [[ "$IS_LINUX" == "true" ]]; then
 fi
 
 # Initialize version managers (only if installed)
-# pyenv initialization
-if [[ -d "$PYENV_ROOT/bin" ]]; then
-  add_to_path "$PYENV_ROOT/bin"
-  if command -v pyenv >/dev/null 2>&1; then
-    eval "$(pyenv init --path)"
-  fi
-fi
+# uv needs no init hook: it is a single binary in ~/.local/bin, with no
+# shims and nothing to eval at shell start.
 
 # rbenv initialization (only if installed)
 if command -v rbenv >/dev/null 2>&1; then

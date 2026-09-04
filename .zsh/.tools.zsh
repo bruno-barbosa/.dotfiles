@@ -69,3 +69,14 @@ elif command -v batcat >/dev/null 2>&1; then
   alias bat='batcat'
   alias bcat='batcat --style=full'
 fi
+
+# ---------------------------------------------------------------- uv
+# Python toolchain: version manager, package manager and tool runner.
+# No init hook and no shims -- only completions are worth loading, and
+# `uv generate-shell-completion` is cheap enough to run at startup.
+if command -v uv >/dev/null 2>&1; then
+  eval "$(uv generate-shell-completion zsh)"
+  # uvx is a real binary shipped alongside uv, but it has its own
+  # completion namespace.
+  command -v uvx >/dev/null 2>&1 && eval "$(uvx --generate-shell-completion zsh)"
+fi

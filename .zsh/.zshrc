@@ -89,7 +89,6 @@ plugins=(
   git-flow
   golang
   npm
-  pyenv
   python
   rake
   rbenv

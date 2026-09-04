@@ -115,7 +115,7 @@ jobs:
       - name: config.yaml parses and has every platform section
         run: |
           sudo snap install yq
-          for section in shared debian osx windows gems pip node; do
+          for section in shared debian osx windows gems python node; do
             n=$(yq e ".setup.packages.$section | length" .config/config.yaml)
             [ "$n" != "null" ] && [ "$n" -gt 0 ] \
               && echo "ok: $section ($n packages)" \

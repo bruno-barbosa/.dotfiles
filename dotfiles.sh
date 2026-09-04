@@ -40,7 +40,7 @@ case "$1" in
     echo ""
     echo "Features:"
     echo "  - Package manager setup (Homebrew on macOS, apt on Linux)"
-    echo "  - Version managers (Volta, Ruby, pyenv)"
+    echo "  - Toolchain managers (Volta, Ruby, uv)"
     echo "  - Zsh configuration with oh-my-zsh + starship prompt"
     echo "  - Modern CLI: zoxide, eza, bat, fzf, delta"
     echo "  - Tmux configuration"
@@ -156,7 +156,7 @@ if [[ "$IS_MACOS" == "true" ]]; then
 fi
 todo_start "Configure vim editor and plugins"
 todo_start "Configure git settings"
-todo_start "Install development version managers (Volta, Ruby, pyenv)"
+todo_start "Install development version managers (Volta, Ruby, uv)"
 echo ""
 
 bot "Let's start the installation process..."
@@ -574,7 +574,7 @@ fi
 
 echo ""
 action "Version Managers Setup"
-todo_progress "Install development version managers (Volta, Ruby, pyenv)"
+todo_progress "Install development version managers (Volta, Ruby, uv)"
 
 # Ruby Version Manager (RVM)
 bot "Would you like to install RVM (Ruby Version Manager)?"
@@ -627,32 +627,37 @@ else
   ok "Skipped Volta installation"
 fi
 
-# Python Version Manager (pyenv)
-bot "Would you like to install pyenv (Python Version Manager)?"
-bot "pyenv allows you to easily install and manage multiple Python versions."
-printf "Install pyenv and Python packages? [y|N] "
+# Python toolchain manager (uv)
+bot "Would you like to install uv (Python package and version manager)?"
+bot "uv installs and pins Python versions, resolves project dependencies, and"
+bot "keeps global CLI tools in isolated environments - pyenv + pip + pipx in one binary."
+printf "Install uv and Python tools? [y|N] "
 read -r python_response
 
 if [[ $python_response =~ ^(y|yes|Y) ]]; then
-  run "Setting up Python version manager (pyenv)"
+  run "Setting up Python toolchain manager (uv)"
   set +e  # Temporarily disable exit on error for this section
   if check_python; then
     if [[ "$UPDATE_MODE" == "true" ]]; then
-      safe_run "pip install --upgrade pip" "pip upgrade"
+      # `uv self update` only exists when uv was installed by its own
+      # installer; a Homebrew/scoop uv upgrades with the package manager and
+      # exits non-zero here, which is why this is a safe_run.
+      safe_run "uv self update" "uv self-update"
+      safe_run "uv tool upgrade --all" "uv tool upgrade"
     fi
     if ! python_installer_start; then
-      warn "Some Python packages failed to install, but continuing..."
+      warn "Some Python tools failed to install, but continuing..."
     fi
     ok "Python setup completed"
   else
-    warn "Python/pip setup had issues, but continuing installation..."
+    warn "uv setup had issues, but continuing installation..."
   fi
   set -e  # Re-enable exit on error
 else
-  ok "Skipped Python/pyenv installation"
+  ok "Skipped uv/Python installation"
 fi
 
-todo_complete "Install development version managers (Volta, Ruby, pyenv)"
+todo_complete "Install development version managers (Volta, Ruby, uv)"
 
 ###############################################################################
 # COMPLETION AND SUMMARY

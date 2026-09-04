@@ -9,7 +9,7 @@ CONFIG_SETUP_PACKAGES_SHARED=""
 CONFIG_SETUP_PACKAGES_DEBIAN=""
 CONFIG_SETUP_PACKAGES_OSX=""
 CONFIG_GEMS=""
-CONFIG_PIP=""
+CONFIG_PYTHON=""
 CONFIG_NODE=""
 
 # Install yq if not available (platform agnostic)
@@ -65,19 +65,20 @@ function _install_yq() {
         fi
     fi
 
-    # Try pip as last resort (cross-platform)
-    if command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1; then
-        run "attempting to install yq via pip..."
-        local pip_cmd="pip"
-        if command -v pip3 >/dev/null 2>&1; then
-            pip_cmd="pip3"
-        fi
+    # Try uv as last resort (cross-platform). Not pip: on a modern distro the
+    # system pip refuses to touch the managed environment (PEP 668), and uv
+    # puts the tool in its own venv with the entry point in ~/.local/bin.
+    if command -v uv >/dev/null 2>&1 || [[ -x "$HOME/.local/bin/uv" ]]; then
+        run "attempting to install yq via uv..."
+        local uv_cmd="uv"
+        command -v uv >/dev/null 2>&1 || uv_cmd="$HOME/.local/bin/uv"
 
-        if $pip_cmd install yq; then
-            ok "yq installed successfully via pip"
+        if $uv_cmd tool install yq; then
+            ok "yq installed successfully via uv"
+            export PATH="$HOME/.local/bin:$PATH"
             return 0
         else
-            warn "failed to install yq via pip"
+            warn "failed to install yq via uv"
         fi
     fi
 
@@ -190,11 +191,11 @@ function _load_config_with_yq() {
         CONFIG_GEMS="$gems"
     fi
 
-    # Load pip packages
-    local pip_packages
-    pip_packages=$(yq e '.setup.packages.pip[]' "$config_file" 2>/dev/null | tr '\n' ' ')
-    if [[ -n "$pip_packages" ]]; then
-        CONFIG_PIP="$pip_packages"
+    # Load python tools (installed with `uv tool install`)
+    local python_tools
+    python_tools=$(yq e '.setup.packages.python[]' "$config_file" 2>/dev/null | tr '\n' ' ')
+    if [[ -n "$python_tools" ]]; then
+        CONFIG_PYTHON="$python_tools"
     fi
 
     # Load node packages
@@ -238,9 +239,9 @@ function get_gems() {
     echo "${CONFIG_GEMS:-}" | xargs
 }
 
-# Get pip packages
-function get_pip_packages() {
-    echo "${CONFIG_PIP:-}" | xargs
+# Get python tools
+function get_python_tools() {
+    echo "${CONFIG_PYTHON:-}" | xargs
 }
 
 # Get node packages
@@ -255,7 +256,7 @@ function print_config() {
     echo "Debian packages: ${CONFIG_SETUP_PACKAGES_DEBIAN:-none}"
     echo "OSX packages: ${CONFIG_SETUP_PACKAGES_OSX:-none}"
     echo "Gems: ${CONFIG_GEMS:-none}"
-    echo "Pip packages: ${CONFIG_PIP:-none}"
+    echo "Python tools: ${CONFIG_PYTHON:-none}"
     echo "Node packages: ${CONFIG_NODE:-none}"
     echo "===================="
 }

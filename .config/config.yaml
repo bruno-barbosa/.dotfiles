@@ -46,19 +46,18 @@ setup:
       - zip
       - xz-utils
 
-      # Development libraries (for building from source)
+      # Development libraries (for building from source).
+      #
+      # This used to be the pyenv build-dependency list, because pyenv compiles
+      # every interpreter from source. uv downloads prebuilt standalone
+      # CPythons instead, so the CPython-only headers (libbz2, liblzma,
+      # libncurses, libreadline, libsqlite3, libxmlsec1, tk) are gone. What
+      # stays is what any native build - a C extension, a Rust crate - still
+      # wants. Add the rest back with apt if you ever do compile CPython.
       - python3-dev
-      - libbz2-dev
       - libffi-dev
-      - liblzma-dev
-      - libncurses5-dev
-      - libncursesw5-dev
-      - libreadline-dev
-      - libsqlite3-dev
       - libssl-dev
       - libxml2-dev
-      - libxmlsec1-dev
-      - tk-dev
       - zlib1g-dev
 
       # Additional development tools
@@ -132,6 +131,9 @@ setup:
       - jq
       - less
       - shellcheck
+      # Python toolchain: uv installs and pins CPython itself, so there is no
+      # separate python entry here. The Unix arm installs it in bin/python/.
+      - uv
       # nerd-fonts bucket
       - MapleMono-NF
     gems:
@@ -141,18 +143,20 @@ setup:
       - pry
       - rspec
 
-    pip:
-      - pip
-      - setuptools
-      - wheel
-      - virtualenv
-      - requests
+    # Global Python CLI tools, installed with `uv tool install` -- each one
+    # lands in its own isolated environment, like pipx.
+    #
+    # This is deliberately tools only, not libraries. pip/setuptools/wheel/
+    # virtualenv are gone because uv provides all four itself, and libraries
+    # (requests, numpy, pandas) belong to a project: `uv add numpy` inside it,
+    # or `uv run --with numpy python` for a one-off.
+    python:
+      - ruff
       - black
       - flake8
       - pytest
       - jupyter
-      - numpy
-      - pandas
+      - httpie
 
     node:
       - npm
