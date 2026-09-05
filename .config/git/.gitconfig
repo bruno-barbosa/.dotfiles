@@ -136,3 +136,9 @@
   path = ~/.dotfiles/.config/git/catppuccin-delta.gitconfig
 [include]
   path = ~/.dotfiles/.config/git/.gitconfig.user
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
