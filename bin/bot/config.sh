@@ -177,6 +177,13 @@ function _load_config_with_yq() {
         CONFIG_SETUP_PACKAGES_DEBIAN="$debian_packages"
     fi
 
+    # Load wsl packages (installed on top of the debian list under WSL)
+    local wsl_packages
+    wsl_packages=$(yq e '.setup.packages.wsl[]' "$config_file" 2>/dev/null | tr '\n' ' ')
+    if [[ -n "$wsl_packages" ]]; then
+        CONFIG_SETUP_PACKAGES_WSL="$wsl_packages"
+    fi
+
     # Load osx packages
     local osx_packages
     osx_packages=$(yq e '.setup.packages.osx[]' "$config_file" 2>/dev/null | tr '\n' ' ')
@@ -229,6 +236,11 @@ function get_packages() {
         "debian")
             platform_packages="${CONFIG_SETUP_PACKAGES_DEBIAN:-}"
             ;;
+        "wsl")
+            # WSL extras only -- the caller installs the debian list first.
+            shared_packages=""
+            platform_packages="${CONFIG_SETUP_PACKAGES_WSL:-}"
+            ;;
     esac
 
     echo "$shared_packages $platform_packages" | xargs
@@ -254,6 +266,7 @@ function print_config() {
     echo "=== Configuration ==="
     echo "Shared packages: ${CONFIG_SETUP_PACKAGES_SHARED:-none}"
     echo "Debian packages: ${CONFIG_SETUP_PACKAGES_DEBIAN:-none}"
+    echo "WSL packages: ${CONFIG_SETUP_PACKAGES_WSL:-none}"
     echo "OSX packages: ${CONFIG_SETUP_PACKAGES_OSX:-none}"
     echo "Gems: ${CONFIG_GEMS:-none}"
     echo "Python tools: ${CONFIG_PYTHON:-none}"

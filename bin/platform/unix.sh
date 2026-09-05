@@ -53,6 +53,14 @@ function detect_linux_distro() {
   fi
 }
 
+# Is this Linux actually WSL? Mirrors the detection in .zsh/.platform.zsh:
+# WSL_DISTRO_NAME is set by WSL2 interop, and the kernel string carries
+# "microsoft" on both WSL1 and WSL2 for the cases where it is not.
+function is_wsl() {
+  [ -n "${WSL_DISTRO_NAME:-}" ] ||
+    grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null
+}
+
 # Package installer for Debian-based distributions
 function unix_install() {
   local package="$1"
@@ -138,6 +146,24 @@ function unix_installer_start() {
       unix_install "$package"
     fi
   done
+
+  # WSL extras, on top of the debian list. Skipped entirely on a native Linux
+  # box, so the Windows-interop tooling never lands where it cannot work.
+  if is_wsl; then
+    local wsl_packages_string
+    wsl_packages_string=$(get_packages "wsl")
+
+    if [[ -n "$wsl_packages_string" ]]; then
+      run "Detected WSL - installing WSL-specific packages"
+      local wsl_packages=()
+      IFS=' ' read -ra wsl_packages <<< "$wsl_packages_string"
+      for package in "${wsl_packages[@]}"; do
+        if [ -n "$package" ]; then
+          unix_install "$package"
+        fi
+      done
+    fi
+  fi
 
   ok "Finished installing packages from configuration"
 }

@@ -86,6 +86,17 @@ setup:
       - grep
       - less
 
+    # Installed only when the installer detects WSL (see bin/platform/unix.sh).
+    # These are plain Debian packages -- they are kept out of the debian list
+    # so a native Linux box does not pull in Windows-interop tooling.
+    wsl:
+      # wslview: the xdg-open WSL lacks, hands URLs to the Windows default
+      # browser. Kept here for the releases that still carry it -- Ubuntu
+      # dropped wslu (gone in 26.04, and ubuntu-wsl no longer depends on it),
+      # where unix_install reports a clean skip. bin/wsl/wsl-open covers
+      # those boxes instead; see .zsh/.wsl.zsh.
+      - wslu
+
     osx:
       # Development utilities
       - gh

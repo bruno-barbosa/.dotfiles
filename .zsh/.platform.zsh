@@ -8,12 +8,24 @@ function detect_os() {
       export OS="macOS"
       export IS_MACOS=true
       export IS_LINUX=false
+      export IS_WSL=false
       export PACKAGE_MANAGER="brew"
       ;;
     Linux)
       export OS="Linux"
       export IS_MACOS=false
       export IS_LINUX=true
+      # WSL is Linux, so everything above still applies -- IS_WSL is an extra
+      # axis, not a third OS. WSL2 sets WSL_DISTRO_NAME, but that is absent in
+      # anything that does not inherit the interop environment (a systemd
+      # service, a cron job), so fall back to the kernel string, which carries
+      # "microsoft" on both WSL1 and WSL2.
+      if [ -n "${WSL_DISTRO_NAME:-}" ] ||
+         grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
+        export IS_WSL=true
+      else
+        export IS_WSL=false
+      fi
       if command -v apt-get >/dev/null 2>&1; then
         export PACKAGE_MANAGER="apt"
         export DISTRO="debian"
@@ -32,6 +44,7 @@ function detect_os() {
       export OS="Unknown"
       export IS_MACOS=false
       export IS_LINUX=false
+      export IS_WSL=false
       export PACKAGE_MANAGER="unknown"
       ;;
   esac

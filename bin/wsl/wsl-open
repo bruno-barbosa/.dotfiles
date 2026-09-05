@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#
+# wsl-open -- open a URL or file with the Windows default application.
+#
+# WSL has no X/Wayland browser and no xdg-open, so anything that wants to
+# open a URL (gh auth login, a dev server, an OAuth redirect) silently does
+# nothing. This hands the argument to Windows over interop instead.
+#
+# This exists because wslu -- the usual answer, providing wslview -- was
+# dropped from the Ubuntu archives (it is gone in 26.04, and ubuntu-wsl no
+# longer depends on it). Where wslu *is* installed we defer to it; otherwise
+# this shim covers the same ground with what WSL always has: cmd.exe.
+#
+# Symlinked as xdg-open in this directory, so tools that call xdg-open
+# directly rather than reading $BROWSER work too.
+
+set -uo pipefail
+
+target="${1:-}"
+
+if [ -z "$target" ]; then
+  echo "usage: ${0##*/} <url|file>" >&2
+  exit 2
+fi
+
+# If wslu is present after all, it is the better-tested tool -- use it.
+# (Guard against recursion: on a box where this script is itself installed
+# as wslview, resolving to ourselves would loop.)
+wslview_path="$(command -v wslview 2>/dev/null || true)"
+if [ -n "$wslview_path" ] && [ "$(readlink -f "$wslview_path")" != "$(readlink -f "$0")" ]; then
+  exec "$wslview_path" "$target"
+fi
+
+# A local path has to be translated to its Windows form; a URL must not be,
+# so only convert arguments that actually exist on the Linux filesystem.
+if [ -e "$target" ] && command -v wslpath >/dev/null 2>&1; then
+  target="$(wslpath -w "$(readlink -f "$target")")"
+fi
+
+# `cmd.exe /c start` is the fast path. It is run from a Windows-visible
+# directory on purpose: started from a Linux cwd it prints a two-line "UNC
+# paths are not supported" warning before working anyway, and that noise
+# ends up in the output of whatever called us.
+cmd_exe="/mnt/c/Windows/System32/cmd.exe"
+if [ -x "$cmd_exe" ]; then
+  # The empty "" is start's title argument -- without it, start treats a
+  # quoted URL as the window title and opens nothing.
+  (cd /mnt/c && "$cmd_exe" /c start "" "$target") >/dev/null 2>&1 && exit 0
+fi
+
+# PowerShell is slower to spin up but needs no cwd trickery, and covers the
+# case where cmd.exe is not where we expect it.
+for ps in \
+  "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe" \
+  "$(command -v powershell.exe 2>/dev/null || true)"
+do
+  if [ -n "$ps" ] && [ -x "$ps" ]; then
+    "$ps" -NoProfile -NonInteractive -Command "Start-Process '${target//\'/\'\'}'" \
+      >/dev/null 2>&1 && exit 0
+  fi
+done
+
+echo "${0##*/}: could not reach Windows interop to open: $target" >&2
+exit 1

@@ -195,6 +195,7 @@ managed interpreter without needing a project.
 - **Prompt**: `.config/starship/starship.toml` — one file, all three platforms
 - **Environment & PATH**: Modify `.zsh/.path.zsh` for PATH and environment variables
 - **Platform Detection**: `.zsh/.platform.zsh` handles OS-specific settings
+- **WSL**: `.zsh/.wsl.zsh` holds WSL-only settings, sourced only when `IS_WSL` is true; it points `$BROWSER` at `bin/wsl/wsl-open` (or `wslview`, where wslu still exists) so URLs open in the Windows browser
 - **Functions**: Add custom functions to `.zsh/functions/` directory
 - **Aliases**: Add custom aliases to `.zsh/aliases/` directory
 
@@ -227,7 +228,8 @@ The dotfiles support selective updates:
 │   ├── node/             # Volta (Node.js) setup
 │   ├── ruby/             # Ruby/RVM setup with permissions fix
 │   ├── python/           # Python toolchain setup (uv)
-│   └── platform/         # Platform-specific (macOS/Linux/fonts)
+│   ├── platform/         # Platform-specific (macOS/Linux/fonts)
+│   └── wsl/              # WSL-only PATH shims (wsl-open, xdg-open)
 ├── .pwsh/                # Windows arm
 │   ├── bootstrap.ps1     # Installer (counterpart to dotfiles.sh)
 │   ├── profile.ps1       # PowerShell profile (mirrors .zshrc + .tools.zsh)
@@ -244,6 +246,7 @@ The dotfiles support selective updates:
 │   ├── .sources.zsh      # Configuration file sourcing
 │   ├── .path.zsh         # PATH and environment variables (platform-aware)
 │   ├── .platform.zsh     # Platform detection and utilities
+│   ├── .wsl.zsh          # WSL-only settings (sourced only under WSL)
 │   ├── aliases/          # Shell aliases
 │   └── functions/        # Custom shell functions
 └── .vim/

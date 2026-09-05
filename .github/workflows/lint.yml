@@ -24,10 +24,11 @@ jobs:
       - name: Collect shell scripts
         id: collect
         run: |
-          # Tracked shell scripts plus the extensionless hooks and git-* subcommands.
+          # Tracked shell scripts plus the extensionless hooks, git-* subcommands
+          # and the WSL PATH shims.
           {
             git ls-files '*.sh' '*.bash'
-            git ls-files '.config/git/hooks/*' '.config/git/subcommands/*'
+            git ls-files '.config/git/hooks/*' '.config/git/subcommands/*' 'bin/wsl/*'
           } | sort -u > /tmp/shfiles
           echo "found $(wc -l < /tmp/shfiles) files:"
           cat /tmp/shfiles
@@ -115,7 +116,7 @@ jobs:
       - name: config.yaml parses and has every platform section
         run: |
           sudo snap install yq
-          for section in shared debian osx windows gems python node; do
+          for section in shared debian wsl osx windows gems python node; do
             n=$(yq e ".setup.packages.$section | length" .config/config.yaml)
             [ "$n" != "null" ] && [ "$n" -gt 0 ] \
               && echo "ok: $section ($n packages)" \
